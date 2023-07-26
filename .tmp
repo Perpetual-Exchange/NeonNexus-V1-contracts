@@ -1,0 +1,123 @@
+### SEPOLIA
+
+|合约|地址|
+|--|--|
+| GMX | 0xB9b84f0Fd7FB846933c5BcEFAFba483fE1b6cD1E |
+| Vault | 0xf0A79aC35A3fd299438D60b6Cb31A8A774AC395f |
+| GLP | 0xc6Bc996320c16cB59f73410ab42eE1C589A0F70A |
+| USDG | 0x25bb9a16f2b3CeA632Ad6bBf383000A5988d86f4 |
+| Router | 0xb4CA1B277D45ecD03eD8BeBFB3157a23da3b0e34 |
+| ShortsTracker | 0x9374747A89f67C61d623426af44ce516cEAfD640 |
+| PositionUtils | 0x32059e10b885a0D3d0131D42c5bebf0FCBfB9A46 |
+| PositionRouter | 0x5623BdC1E5E2c9B385b1994643fB0b74d994489e |
+| OrderBook | 0x60E98Cf25C73f2a4A29D1543715AD128CEABFfcA |
+| PositionManager | 0x2BdD74C94b2552e7dD89Acd035d23c8B0227efF6 |
+| OrderBookReader | 0xceA838dD4D39a4B06E994F8310DADed41977cb17 |
+| Reader | 0xAc4fDdBdD51f59B01453aBEB208F691713E645D3 |
+| sbfGMX <= RewardTracker | 0x99602CEBa5Ef26b502d912d02e84B1d2942A0CF1 |
+| fsGLP <= RewardTracker | 0xB0658bcE7C4dF938050D749D3363A43C6Bf501bE |
+| fGLP <= RewardTracker | 0xa0D25aA8290fa041B6BAddD59c4D4EDF69A8C9D0 |
+| GlpManager | 0xCBC62aF283bfFB69246Af143Ec349261Bc403eC6 |
+| StakedGlp | 0x3E55FC62680Cb93c54135b821a0306DB16837fBa |
+| GMXRewardRouterV2 | 0x79cb864E2c39fbDf5ceF1f8A3Bc28B7d0d6b3dD1 |
+| GlpRewardRouterV2 | 0x8c63b343580Dc693271Cf9609D6655b6B1B499b7 |
+| EsGMX | 0x42F53160a578aAA4884734D41598d644DBEc9C22 |
+| bnGMX <= MintableBaseToken | 0xb31984593a4C7D922E96D189A58f6cB2E5340b66 |
+| VaultReader | 0x9C716BA14d87c53041bB7fF95C977d5a382E71F7 |
+| RewardReader | 0x7b8416B698B3F48bdf1A8Ab364D8c61FbaEB93d6 |
+| sGMX <= RewardTracker | 0x320D8997A688DaC8a96703eC44cdc736D7E2B518 |
+| sbGMX <= RewardTracker | 0xd95b82746E9b684F73676061B2fE4c8f3b034f1A |
+| sbfGMX <= RewardTracker | 0xac5D28fcC5d0E155A2C88CE816B70718699a0d39 |
+| StakedGmxDistributor <= RewardDistributor | 0xb3255FEAF7F5356522Ea6FFd189DcB7b25F990f0 |
+| StakedGlpDistributor <= RewardDistributor | 0x62DcD800466792aF537afA6537c7E01379f37Ad8 |
+| GmxVester <= Vester | 0x384473b6759A0d24F44cb241DaaC76d1E40a5AFe |
+| GlpVester <= Vester | 0xE2C2e2Cc0AA8194535411Abf74aCB15fb6Ec75F8 |
+| TraderJoeGmxAvaxPool | 第三方dex 交易对合约 | 
+| ReferralStorage | 0x0f75eA8D6DCF062Ac3bcA5aB241644f8f72F5Da8 | 
+| ReferralReader | 0x5D45e23753a29626914e0044A62b03C0831faC92 | 
+| TokenManager | 0x9a2Ca11fAe50c8C31d74abF9736Ba6F2DEd1b304 | 
+| Timelock | 0xDfDd9C4532A6A42469088652D302F558F4B48e83 | 
+| Multicall | 第三方公开批量合约操作 | 
+
+
+应该是另外个项目的：
+
+|合约|地址|
+|--|--|
+| Treasury | 0xDB932cCD0f8B7bECC4f77Dc7375bef91662b09d4 |
+| GMT | 0x82F04721C5a89774ACeE66fb1019EF3C31687215 |
+| PancakeFactory V1 | 0xBCfCcbde45cE874adCB698cC183deBcF17952812 |
+| PancakeFactory V2 | 0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73 |
+| GmxMigrator | 0xd97e4454AAa02020f53F97EE4e378eD7E42738A6 |
+| XGMT | 0x73B4E9A2743529c8BAC8f98be1Bb68b440cA7F55 |
+| GMT_GMX_IOU | 0x887c5B86fBeB45225F1355F9354ade2b303CA408 |
+| XGMT_GMX_IOU | 0xa1e5E4F7d846560F49a7beeB50d812a447Fdf36A |
+| GMT_USDG_GMX_IOU | 0x5b0D8023a5c740aA03865fB645fDD823e02cdFA2 |
+| XGMT_USDG_GMX_IOU | 0x7F49c525855A34e3478c6bD57c849c66d42B4fde |
+
+部署顺序：
+1. GMX
+2. Vault
+3. GLP
+4. USDG 
+   - 依赖: 
+   - Vault
+5. Router 
+   - 依赖: 
+   - Vault
+   - USDG
+   - WETH
+6. ShortsTracker 
+   - 依赖: 
+   - Vault
+7. PositionRouter 
+   - 依赖: 
+   - Vault
+   - USDG
+   - WETH
+   - ShortsTracker
+   - DepositFee: ex. 30
+   - MinExectutionFee: ex. 2000000000
+8. OrderBook
+9. PositionManager 
+   - 依赖:
+   - Vault
+   - ShortsTracker
+   - WETH
+   - DepositFee: ex. 30
+   - OrderBook
+10. OrderBookReader
+11. Reader
+12. RewardTracker * 3
+    - 依赖:
+    - NAME: Stackd + Bonus + Fee GMX | Fee Staked GLP | Fee GLP
+    - SYMBOL: sbfGMX | fsGLP | fGLP
+13. GLPManager 
+    - 依赖:
+    - Vault
+    - USDG
+    - GLP
+    - CooldDownDuration: ex. 900
+14. StakedGlp 
+    - 依赖:
+    - GLP
+    - GLPManager
+    - fsGLP(Fee Staked GLP | StakedGlpTracker)
+    - fGLP(Fee GLP | FeeGlpTracker)
+15. GmxRewardRouterV2
+16. GlpRewardRouterV2
+17. EsGMX
+18. bnGMX
+19. VaultReader
+20. RewardReader
+21. sGMX
+22. sbGMX
+23. sbfGMX
+24. StakedGmxDistributor
+25. StakedGlpDistributor
+26. GmxVester
+27. GlpVester
+28. ReferralStorage
+29. ReferralReader
+30. TokenManager
+31. Timelock
