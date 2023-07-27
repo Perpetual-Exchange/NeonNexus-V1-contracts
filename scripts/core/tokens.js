@@ -501,22 +501,48 @@ module.exports = {
     btc: {
       address: "0xdd9D0b2e8eE0552ee93AAEd6af62D386bF19b70E",
       decimals: 18,
+      priceFeed: "0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43",
+      priceDecimals: 8,
+      isStrictStable: false,
+      fastPricePrecision: 1000,
+      maxCumulativeDeltaDiff: 0.1 * 10 * 1000 * 1000, // 10%
     },
     eth: {
       address: "0x05a43eACB39cE876C9303417659c125Db3723d0A",
       decimals: 18,
+      spreadBasisPoints: 0,
+      priceFeed: "0x694AA1769357215DE4FAC081bf1f309aDC325306",
+      priceDecimals: 8,
+      isStrictStable: false,
+      fastPricePrecision: 1000,
+      maxCumulativeDeltaDiff: 0.1 * 10 * 1000 * 1000, // 10%
     },
     link: {
       address: "0x7E209F90c1D7238163947339b37ef34aaa86795D",
       decimals: 18,
+      priceFeed: "0xc59E3633BAAC79493d908e63626716e204A45EdF",
+      priceDecimals: 8,
+      isStrictStable: false,
+      fastPricePrecision: 1000,
+      maxCumulativeDeltaDiff: 0.1 * 10 * 1000 * 1000, // 10%
     },
     dai: {
       address: "0x6530b1af3CdCe25574F44E3a284158f3AfF89Ed1",
       decimals: 18,
+      priceFeed: "0x14866185B1962B63C3Ea9E03Bc1da838bab34C19",
+      priceDecimals: 8,
+      isStrictStable: true,
+      fastPricePrecision: 1000,
+      maxCumulativeDeltaDiff: 0.1 * 10 * 1000 * 1000, // 10%
     },
     usdc: {
       address: "0xd41D4FeF58b8c008F6e4d9614f2Fa9ed2Aec8aAb",
       decimals: 18,
+      priceFeed: "0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E",
+      priceDecimals: 8,
+      isStrictStable: true,
+      fastPricePrecision: 1000,
+      maxCumulativeDeltaDiff: 0.1 * 10 * 1000 * 1000, // 10%
     },
     nativeToken: {
       address: "0x05a43eACB39cE876C9303417659c125Db3723d0A",

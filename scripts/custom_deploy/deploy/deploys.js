@@ -2,14 +2,48 @@ const {
   deployContract,
   contractAt,
   writeTmpAddresses,
-} = require("../shared/helpers");
+} = require("../../shared/helpers");
 
 async function deployGMX() {
   return await deployContract("GMX", []);
 }
 
+async function deployFastPriceEvents() {
+  return await deployContract("FastPriceEvents", []);
+}
+
+async function deployFastPriceFeed(
+  priceDuration,
+  maxPriceUpdateDelay,
+  minBlockInterval,
+  maxDeviationBasisPoints,
+  fastPriceEvents,
+  tokenManager
+) {
+  return await deployContract("FastPriceFeed", [
+    priceDuration, // _priceDuration
+    maxPriceUpdateDelay, // _maxPriceUpdateDelay
+    minBlockInterval, // _minBlockInterval
+    maxDeviationBasisPoints, // _maxDeviationBasisPoints
+    fastPriceEvents.address, // _fastPriceEvents
+    tokenManager.address, // _tokenManager
+  ]);
+}
+
+async function deployVaultPriceFeed() {
+  return await deployContract("VaultPriceFeed", []);
+}
+
 async function deployVault() {
   return await deployContract("Vault", []);
+}
+
+async function deployVaultErrorController() {
+  return await deployContract("VaultErrorController", []);
+}
+
+async function deployVaultUtils(vault) {
+  return await deployContract("VaultUtils", [vault.address]);
 }
 
 async function deployGLP() {
@@ -245,6 +279,8 @@ async function deployGmxIou(gmxMigrator, name, label) {
 module.exports = {
   deployGMX,
   deployVault,
+  deployVaultErrorController,
+  deployVaultUtils,
   deployGLP,
   deployUSDG,
   deployRouter,
@@ -268,6 +304,9 @@ module.exports = {
   deployReferralReader,
   deployTimelock,
   deployTokenManager,
+  deployFastPriceEvents,
+  deployFastPriceFeed,
+  deployVaultPriceFeed,
 
   deployTreasury,
   deployGMT,

@@ -2,10 +2,10 @@ const {
   deployContract,
   contractAt,
   writeTmpAddresses,
-} = require("../shared/helpers");
+} = require("../../shared/helpers");
 
 const network = process.env.HARDHAT_NETWORK || "mainnet";
-const tokens = require("../core/tokens")[network];
+const tokens = require("../../core/tokens")[network];
 
 const {
   deployGMX,
