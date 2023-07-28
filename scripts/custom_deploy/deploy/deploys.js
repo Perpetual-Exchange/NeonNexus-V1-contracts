@@ -30,6 +30,14 @@ async function deployFastPriceFeed(
   ]);
 }
 
+async function deployPriceFeedTimelock(admin, buffer, tokenManager) {
+  return await deployContract(
+    "PriceFeedTimelock",
+    [admin, buffer, tokenManager.address],
+    "Timelock"
+  );
+}
+
 async function deployVaultPriceFeed() {
   return await deployContract("VaultPriceFeed", []);
 }
@@ -259,6 +267,19 @@ async function deployTokenManager(minAuthorizations) {
   );
 }
 
+async function deployShortsTrackerTimelock(
+  admin,
+  buffer,
+  updateDelay,
+  maxAveragePriceChange
+) {
+  return await deployContract("ShortsTrackerTimelock", [
+    admin,
+    buffer,
+    updateDelay,
+    maxAveragePriceChange,
+  ]);
+}
 // 应该是其他项目 GameBit
 async function deployTreasury() {
   return await deployContract("Treasury", []);
@@ -307,6 +328,8 @@ module.exports = {
   deployFastPriceEvents,
   deployFastPriceFeed,
   deployVaultPriceFeed,
+  deployPriceFeedTimelock,
+  deployShortsTrackerTimelock,
 
   deployTreasury,
   deployGMT,

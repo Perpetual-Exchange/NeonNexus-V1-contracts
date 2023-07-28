@@ -1,11 +1,15 @@
-const { contractAt, sendTxn } = require("../../shared/helpers");
+const { getFrameSigner, contractAt, sendTxn } = require("../../shared/helpers");
 const { getContracts } = require("./contracts");
 const { expandDecimals } = require("../../../test/shared/utilities");
 const { toUsd } = require("../../../test/shared/units");
 const { errors } = require("../../../test/core/Vault/helpers");
+const network = process.env.HARDHAT_NETWORK || "mainnet";
+
 const tokens = require("../../core/tokens")[network];
 
 async function main() {
+  const signer = await getFrameSigner();
+
   const {
     vaultPriceFeed,
     glp,
@@ -23,7 +27,35 @@ async function main() {
     shortsTracker,
     secondaryPriceFeed,
     tokenManager,
+    fastPriceEvents,
+    priceFeedTimelock,
+    shortsTrackerTimelock,
   } = await getContracts();
+  // initialize VaultPriceFeed
+  //   const priceFeedTimelockSigners = [
+  //     "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu
+  //     "0xA4091e09eB027F1e5D397659bfC7D73CdDdCa276", // xiaowu
+  //   ];
+
+  //   for (let i = 0; i < priceFeedTimelockSigners.length; i++) {
+  //     const signer = priceFeedTimelockSigners[i];
+  //     await sendTxn(
+  //       priceFeedTimelock.setContractHandler(signer, true),
+  //       `deployedTimelock.setContractHandler(${signer})`
+  //     );
+  //   }
+
+  //   const priceFeedTimelockKeepers = [
+  //     "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu
+  //   ];
+
+  //   for (let i = 0; i < priceFeedTimelockKeepers.length; i++) {
+  //     const keeper = priceFeedTimelockKeepers[i];
+  //     await sendTxn(
+  //       priceFeedTimelock.setKeeper(keeper, true),
+  //       `deployedTimelock.setKeeper(${keeper})`
+  //     );
+  //   }
   // initialize VaultPriceFeed
   //   await sendTxn(
   //     vaultPriceFeed.setMaxStrictPriceDeviation(expandDecimals(1, 28)),
@@ -37,125 +69,124 @@ async function main() {
   //     vaultPriceFeed.setIsAmmEnabled(false),
   //     "vaultPriceFeed.setIsAmmEnabled"
   //   );
-  await sendTxn(
-    vaultPriceFeed.setSecondaryPriceFeed(secondaryPriceFeed.address),
-    "vaultPriceFeed.setSecondaryPriceFeed"
-  );
-  const chainlinkFlags = {
-    address: "0x0000000000000000000000000000000000000000",
-  };
-  if (chainlinkFlags) {
-    await sendTxn(
-      vaultPriceFeed.setChainlinkFlags(chainlinkFlags.address),
-      "vaultPriceFeed.setChainlinkFlags"
-    );
-  }
+  //   await sendTxn(
+  //     vaultPriceFeed.setSecondaryPriceFeed(secondaryPriceFeed.address),
+  //     "vaultPriceFeed.setSecondaryPriceFeed"
+  //   );
+  //   const chainlinkFlags = {
+  //     address: "0x0000000000000000000000000000000000000000",
+  //   };
+  //   if (chainlinkFlags) {
+  //     await sendTxn(
+  //       vaultPriceFeed.setChainlinkFlags(chainlinkFlags.address),
+  //       "vaultPriceFeed.setChainlinkFlags"
+  //     );
+  //   }
+  //   const { btc, eth, link, dai, usdc } = tokens;
+  //   const tokenArr = [btc, eth, link, dai, usdc];
+  //   const fastPriceTokens = [btc, eth, link];
 
-  const { btc, eth, link, dai, usdc } = tokens;
-  const tokenArr = [btc, eth, link, dai, usdc];
-  const fastPriceTokens = [btc, eth, link];
+  //   const updater1 = { address: "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471" };
+  //   const updater2 = { address: "0xA4091e09eB027F1e5D397659bfC7D73CdDdCa276" };
+  //   const keeper1 = { address: "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471" };
+  //   const keeper2 = { address: "0xA4091e09eB027F1e5D397659bfC7D73CdDdCa276" };
+  //   const updaters = [
+  //     updater1.address,
+  //     updater2.address,
+  //     keeper1.address,
+  //     keeper2.address,
+  //   ];
 
-  const updater1 = { address: "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471" };
-  const updater2 = { address: "0xA4091e09eB027F1e5D397659bfC7D73CdDdCa276" };
-  const keeper1 = { address: "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471" };
-  const keeper2 = { address: "0xA4091e09eB027F1e5D397659bfC7D73CdDdCa276" };
-  const updaters = [
-    updater1.address,
-    updater2.address,
-    keeper1.address,
-    keeper2.address,
-  ];
+  //   for (const [i, tokenItem] of tokenArr.entries()) {
+  //     if (tokenItem.spreadBasisPoints === undefined) {
+  //       continue;
+  //     }
+  //     await sendTxn(
+  //       vaultPriceFeed.setSpreadBasisPoints(
+  //         tokenItem.address, // _token
+  //         tokenItem.spreadBasisPoints // _spreadBasisPoints
+  //       ),
+  //       `vaultPriceFeed.setSpreadBasisPoints(${tokenItem.name}) ${tokenItem.spreadBasisPoints}`
+  //     );
+  //   }
 
-  for (const [i, tokenItem] of tokenArr.entries()) {
-    if (tokenItem.spreadBasisPoints === undefined) {
-      continue;
-    }
-    await sendTxn(
-      vaultPriceFeed.setSpreadBasisPoints(
-        tokenItem.address, // _token
-        tokenItem.spreadBasisPoints // _spreadBasisPoints
-      ),
-      `vaultPriceFeed.setSpreadBasisPoints(${tokenItem.name}) ${tokenItem.spreadBasisPoints}`
-    );
-  }
+  //   for (const token of tokenArr) {
+  //     await sendTxn(
+  //       vaultPriceFeed.setTokenConfig(
+  //         token.address, // _token
+  //         token.priceFeed, // _priceFeed
+  //         token.priceDecimals, // _priceDecimals
+  //         token.isStrictStable // _isStrictStable
+  //       ),
+  //       `vaultPriceFeed.setTokenConfig(${token.name}) ${token.address} ${token.priceFeed}`
+  //     );
+  //   }
 
-  for (const token of tokenArr) {
-    await sendTxn(
-      vaultPriceFeed.setTokenConfig(
-        token.address, // _token
-        token.priceFeed, // _priceFeed
-        token.priceDecimals, // _priceDecimals
-        token.isStrictStable // _isStrictStable
-      ),
-      `vaultPriceFeed.setTokenConfig(${token.name}) ${token.address} ${token.priceFeed}`
-    );
-  }
+  //   const signers = ["0xc71aABBC653C7Bd01B68C35B8f78F82A21014471"];
+  //   await sendTxn(
+  //     secondaryPriceFeed.initialize(1, signers, updaters),
+  //     "secondaryPriceFeed.initialize"
+  //   );
+  //   await sendTxn(
+  //     secondaryPriceFeed.setTokens(
+  //       fastPriceTokens.map((t) => t.address),
+  //       fastPriceTokens.map((t) => t.fastPricePrecision)
+  //     ),
+  //     "secondaryPriceFeed.setTokens"
+  //   );
+  //   await sendTxn(
+  //     secondaryPriceFeed.setVaultPriceFeed(vaultPriceFeed.address),
+  //     "secondaryPriceFeed.setVaultPriceFeed"
+  //   );
+  //   await sendTxn(
+  //     secondaryPriceFeed.setMaxTimeDeviation(60 * 60),
+  //     "secondaryPriceFeed.setMaxTimeDeviation"
+  //   );
+  //   await sendTxn(
+  //     secondaryPriceFeed.setSpreadBasisPointsIfInactive(50),
+  //     "secondaryPriceFeed.setSpreadBasisPointsIfInactive"
+  //   );
+  //   await sendTxn(
+  //     secondaryPriceFeed.setSpreadBasisPointsIfChainError(500),
+  //     "secondaryPriceFeed.setSpreadBasisPointsIfChainError"
+  //   );
+  //   await sendTxn(
+  //     secondaryPriceFeed.setMaxCumulativeDeltaDiffs(
+  //       fastPriceTokens.map((t) => t.address),
+  //       fastPriceTokens.map((t) => t.maxCumulativeDeltaDiff)
+  //     ),
+  //     "secondaryPriceFeed.setMaxCumulativeDeltaDiffs"
+  //   );
+  //   await sendTxn(
+  //     secondaryPriceFeed.setPriceDataInterval(1 * 60),
+  //     "secondaryPriceFeed.setPriceDataInterval"
+  //   );
 
-  const signers = ["0xc71aABBC653C7Bd01B68C35B8f78F82A21014471"];
-  await sendTxn(
-    secondaryPriceFeed.initialize(1, signers, updaters),
-    "secondaryPriceFeed.initialize"
-  );
-  await sendTxn(
-    secondaryPriceFeed.setTokens(
-      fastPriceTokens.map((t) => t.address),
-      fastPriceTokens.map((t) => t.fastPricePrecision)
-    ),
-    "secondaryPriceFeed.setTokens"
-  );
-  await sendTxn(
-    secondaryPriceFeed.setVaultPriceFeed(vaultPriceFeed.address),
-    "secondaryPriceFeed.setVaultPriceFeed"
-  );
-  await sendTxn(
-    secondaryPriceFeed.setMaxTimeDeviation(60 * 60),
-    "secondaryPriceFeed.setMaxTimeDeviation"
-  );
-  await sendTxn(
-    secondaryPriceFeed.setSpreadBasisPointsIfInactive(50),
-    "secondaryPriceFeed.setSpreadBasisPointsIfInactive"
-  );
-  await sendTxn(
-    secondaryPriceFeed.setSpreadBasisPointsIfChainError(500),
-    "secondaryPriceFeed.setSpreadBasisPointsIfChainError"
-  );
-  await sendTxn(
-    secondaryPriceFeed.setMaxCumulativeDeltaDiffs(
-      fastPriceTokens.map((t) => t.address),
-      fastPriceTokens.map((t) => t.maxCumulativeDeltaDiff)
-    ),
-    "secondaryPriceFeed.setMaxCumulativeDeltaDiffs"
-  );
-  await sendTxn(
-    secondaryPriceFeed.setPriceDataInterval(1 * 60),
-    "secondaryPriceFeed.setPriceDataInterval"
-  );
+  //   await sendTxn(
+  //     positionRouter.setPositionKeeper(secondaryPriceFeed.address, true),
+  //     "positionRouter.setPositionKeeper(secondaryPriceFeed)"
+  //   );
+  //   await sendTxn(
+  //     positionRouter.setPositionKeeper(secondaryPriceFeed.address, true),
+  //     "positionRouter.setPositionKeeper(secondaryPriceFeed)"
+  //   );
+  //   await sendTxn(
+  //     fastPriceEvents.setIsPriceFeed(secondaryPriceFeed.address, true),
+  //     "fastPriceEvents.setIsPriceFeed"
+  //   );
 
-  await sendTxn(
-    positionRouter1.setPositionKeeper(secondaryPriceFeed.address, true),
-    "positionRouter.setPositionKeeper(secondaryPriceFeed)"
-  );
-  await sendTxn(
-    positionRouter2.setPositionKeeper(secondaryPriceFeed.address, true),
-    "positionRouter.setPositionKeeper(secondaryPriceFeed)"
-  );
-  await sendTxn(
-    fastPriceEvents.setIsPriceFeed(secondaryPriceFeed.address, true),
-    "fastPriceEvents.setIsPriceFeed"
-  );
-
-  await sendTxn(
-    vaultPriceFeed.setGov(priceFeedTimelock.address),
-    "vaultPriceFeed.setGov"
-  );
-  await sendTxn(
-    secondaryPriceFeed.setGov(priceFeedTimelock.address),
-    "secondaryPriceFeed.setGov"
-  );
-  await sendTxn(
-    secondaryPriceFeed.setTokenManager(tokenManager.address),
-    "secondaryPriceFeed.setTokenManager"
-  );
+  //   await sendTxn(
+  //     vaultPriceFeed.setGov(priceFeedTimelock.address),
+  //     "vaultPriceFeed.setGov"
+  //   );
+  //   await sendTxn(
+  //     secondaryPriceFeed.setGov(priceFeedTimelock.address),
+  //     "secondaryPriceFeed.setGov"
+  //   );
+  //   await sendTxn(
+  //     secondaryPriceFeed.setTokenManager(tokenManager.address),
+  //     "secondaryPriceFeed.setTokenManager"
+  //   );
 
   // initialize GLP
   //   await sendTxn(
@@ -321,6 +352,76 @@ async function main() {
   //       "positionManager.setGov"
   //     );
   //   }
+
+  // initialize ReferralStorage
+  //   await sendTxn(
+  //     referralStorage.setGov(timelock.address),
+  //     "referralStorage.setGov(timelock)"
+  //   );
+
+  //   initialize ShortsTrackerTimelock
+  //   const shortsTrackerTimelockHandlers = [
+  //     "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471",
+  //   ];
+  //   for (const handler of shortsTrackerTimelockHandlers) {
+  //     await sendTxn(
+  //       shortsTrackerTimelock.setContractHandler(handler, true),
+  //       `shortsTrackerTimelock.setContractHandler ${handler}`
+  //     );
+  //   }
+  //   //   initialize PositionRouter
+  //   const referralStorageGov = await contractAt(
+  //     "Timelock",
+  //     await referralStorage.gov()
+  //     // signer
+  //   );
+
+  //   await sendTxn(
+  //     positionRouter.setReferralStorage(referralStorage.address),
+  //     "positionRouter.setReferralStorage"
+  //   );
+  //   await sendTxn(
+  //     referralStorageGov.signalSetHandler(
+  //       referralStorage.address,
+  //       positionRouter.address,
+  //       true
+  //     ),
+  //     "referralStorage.signalSetHandler(positionRouter)"
+  //   );
+
+  // 存在问题 官方提供的代码参数缺少
+  //   await sendTxn(
+  //     shortsTrackerTimelock.signalSetHandler(
+  //       positionRouter.address,
+  //       true
+  //     ),
+  //     "shortsTrackerTimelock.signalSetHandler(positionRouter)"
+  //   );
+
+  //   await sendTxn(router.addPlugin(positionRouter.address), "router.addPlugin");
+
+  //   await sendTxn(
+  //     positionRouter.setDelayValues(0, 180, 30 * 60),
+  //     "positionRouter.setDelayValues"
+  //   );
+  //   await sendTxn(
+  //     timelock.setContractHandler(positionRouter.address, true),
+  //     "timelock.setContractHandler(positionRouter)"
+  //   );
+
+  //   await sendTxn(
+  //     positionRouter.setGov(await vault.gov()),
+  //     "positionRouter.setGov"
+  //   );
+
+  //   也存在问题
+  //   const positionRouterCapKeeperWallet = {
+  //     address: "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471",
+  //   };
+  //   await sendTxn(
+  //     positionRouter.setAdmin(positionRouterCapKeeperWallet.address),
+  //     "positionRouter.setAdmin"
+  //   );
 }
 
 main()

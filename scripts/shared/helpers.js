@@ -51,12 +51,18 @@ function getChainId(network) {
     return 43114;
   }
 
+  if (network === "sepolia") {
+    return 11155111;
+  }
+
   throw new Error("Unsupported network");
 }
 
 async function getFrameSigner(options) {
   try {
-    const frame = new ethers.providers.JsonRpcProvider("http://127.0.0.1:1248");
+    const frame = new ethers.providers.JsonRpcProvider(
+      "https://rpc.ankr.com/eth_sepolia"
+    );
     const signer = frame.getSigner();
     let networkToCheck = network;
     if (options && options.network) {

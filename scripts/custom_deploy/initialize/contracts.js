@@ -98,6 +98,20 @@ async function getContracts() {
     "0x9a2Ca11fAe50c8C31d74abF9736Ba6F2DEd1b304"
   );
 
+  const fastPriceEvents = await contractAt(
+    "FastPriceEvents",
+    "0x9b8854a9184f75d2F2c862d21E09FcCbd9131931"
+  );
+
+  const priceFeedTimelock = await contractAt(
+    "PriceFeedTimelock",
+    "0xf09c61193A448C0874D1bC7856f23B3E1be00C1a"
+  );
+  const shortsTrackerTimelock = await contractAt(
+    "ShortsTrackerTimelock",
+    "0xDfDd9C4532A6A42469088652D302F558F4B48e83"
+  );
+
   return {
     vaultPriceFeed,
     glp,
@@ -115,6 +129,9 @@ async function getContracts() {
     shortsTracker,
     secondaryPriceFeed,
     tokenManager,
+    fastPriceEvents,
+    priceFeedTimelock,
+    shortsTrackerTimelock,
   };
 }
 
