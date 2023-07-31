@@ -26,6 +26,21 @@ async function getContracts() {
     "0xB9b84f0Fd7FB846933c5BcEFAFba483fE1b6cD1E"
   );
 
+  const esGMX = await contractAt(
+    "EsGMX",
+    "0x42F53160a578aAA4884734D41598d644DBEc9C22"
+  );
+
+  const sGMX = await contractAt(
+    "RewardTracker",
+    "0x320D8997A688DaC8a96703eC44cdc736D7E2B518"
+  );
+
+  const sGmxDistributor = await contractAt(
+    "RewardDistributor",
+    "0xb3255FEAF7F5356522Ea6FFd189DcB7b25F990f0"
+  );
+
   const usdg = await contractAt(
     "USDG",
     "0x25bb9a16f2b3CeA632Ad6bBf383000A5988d86f4"
@@ -118,6 +133,9 @@ async function getContracts() {
     glpManager,
     vault,
     gmx,
+    esGMX,
+    sGMX,
+    sGmxDistributor,
     usdg,
     router,
     vaultErrorController,

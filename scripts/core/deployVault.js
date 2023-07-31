@@ -43,10 +43,15 @@ async function main() {
     "glp.setInPrivateTransferMode"
   );
   // const glp = await contractAt("GLP", "0x4277f8F2c384827B5273592FF7CeBd9f2C1ac258")
+
+  const shortsTracker = await deployContract("ShortsTracker", [vault.address]);
+  await shortsTracker.setIsGlobalShortDataReady(true);
+
   const glpManager = await deployContract("GlpManager", [
     vault.address,
     usdg.address,
     glp.address,
+    shortsTracker.address,
     15 * 60,
   ]);
   await sendTxn(

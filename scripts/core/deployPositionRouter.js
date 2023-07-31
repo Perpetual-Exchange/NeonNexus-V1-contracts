@@ -17,6 +17,8 @@ const {
   ARBITRUM_CAP_KEEPER_KEY,
   AVAX_URL,
   AVAX_CAP_KEEPER_KEY,
+  SEPOLIA_URL,
+  SEPOLIA_DEPLOY_KEY,
 } = require("../../env.json");
 
 async function getArbValues(signer) {
@@ -108,6 +110,50 @@ async function getAvaxValues(signer) {
   };
 }
 
+async function getSepoliaValues(signer) {
+  const provider = new ethers.providers.JsonRpcProvider(SEPOLIA_URL);
+  const capKeeperWallet = new ethers.Wallet(SEPOLIA_DEPLOY_KEY).connect(
+    provider
+  );
+
+  const vault = await contractAt(
+    "Vault",
+    "0x7531626E87BdA9B8511bea536136e5349EDacE89"
+  );
+  const timelock = await contractAt("Timelock", await vault.gov(), signer);
+  const router = await contractAt("Router", await vault.router(), signer);
+  const weth = await contractAt("WETH", tokens.nativeToken.address);
+  const referralStorage = await contractAt(
+    "ReferralStorage",
+    "0x9813eEC5CfBdC1F8E6c73492c8De1c0FDBa09CDB"
+  );
+  const shortsTracker = await contractAt(
+    "ShortsTracker",
+    "0x3bB314A3106A324342EB6c8F62AF94c8231736CE",
+    signer
+  );
+  const shortsTrackerTimelock = await contractAt(
+    "ShortsTrackerTimelock",
+    "0x366d70975342A24e14580610e89b8C4716280773",
+    signer
+  );
+  const depositFee = "30"; // 0.3%
+  const minExecutionFee = "20000000000000000"; // 0.02 AVAX
+
+  return {
+    capKeeperWallet,
+    vault,
+    timelock,
+    router,
+    weth,
+    referralStorage,
+    shortsTracker,
+    shortsTrackerTimelock,
+    depositFee,
+    minExecutionFee,
+  };
+}
+
 async function getValues(signer) {
   if (network === "arbitrum") {
     return getArbValues(signer);
@@ -115,6 +161,10 @@ async function getValues(signer) {
 
   if (network === "avax") {
     return getAvaxValues(signer);
+  }
+
+  if (network === "sepolia") {
+    return getSepoliaValues(signer);
   }
 }
 
@@ -174,10 +224,10 @@ async function main() {
     "referralStorage.signalSetHandler(positionRouter)"
   );
 
-  await sendTxn(
-    shortsTrackerTimelock.signalSetHandler(positionRouter.address, true),
-    "shortsTrackerTimelock.signalSetHandler(positionRouter)"
-  );
+  //   await sendTxn(
+  //     shortsTrackerTimelock.signalSetHandler(positionRouter.address, true),
+  //     "shortsTrackerTimelock.signalSetHandler(positionRouter)"
+  //   );
 
   await sendTxn(router.addPlugin(positionRouter.address), "router.addPlugin");
 

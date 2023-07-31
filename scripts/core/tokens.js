@@ -493,11 +493,6 @@ module.exports = {
     },
   },
   sepolia: {
-    btcPriceFeed: { address: "0x1b44F3514812d835EB1BDB0acB33d3fA3351Ee43" },
-    ethPriceFeed: { address: "0x694AA1769357215DE4FAC081bf1f309aDC325306" },
-    linkPriceFeed: { address: "0xc59E3633BAAC79493d908e63626716e204A45EdF" },
-    daiPriceFeed: { address: "0x14866185B1962B63C3Ea9E03Bc1da838bab34C19" },
-    usdcPriceFeed: { address: "0xA2F78ab2355fe2f984D808B5CeE7FD0A93D5270E" },
     btc: {
       name: "BTC",
       address: "0xdd9D0b2e8eE0552ee93AAEd6af62D386bF19b70E",
@@ -510,7 +505,7 @@ module.exports = {
     },
     eth: {
       name: "ETH",
-      address: "0x05a43eACB39cE876C9303417659c125Db3723d0A",
+      address: "0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1",
       decimals: 18,
       spreadBasisPoints: 0,
       priceFeed: "0x694AA1769357215DE4FAC081bf1f309aDC325306",
@@ -551,7 +546,7 @@ module.exports = {
     },
     nativeToken: {
       name: "ETH",
-      address: "0x05a43eACB39cE876C9303417659c125Db3723d0A",
+      address: "0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1",
       decimals: 18,
     },
   },

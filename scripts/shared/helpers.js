@@ -10,18 +10,22 @@ const AVALANCHE = 43114;
 const {
   ARBITRUM_URL,
   AVAX_URL,
+  SEPOLIA_URL,
   ARBITRUM_DEPLOY_KEY,
   AVAX_DEPLOY_KEY,
+  SEPOLIA_DEPLOY_KEY,
 } = require("../../env.json");
 
 const providers = {
   arbitrum: new ethers.providers.JsonRpcProvider(ARBITRUM_URL),
   avax: new ethers.providers.JsonRpcProvider(AVAX_URL),
+  sepolia: new ethers.providers.JsonRpcProvider(SEPOLIA_URL),
 };
 
 const signers = {
   arbitrum: new ethers.Wallet(ARBITRUM_DEPLOY_KEY).connect(providers.arbitrum),
-  avax: new ethers.Wallet(ARBITRUM_DEPLOY_KEY).connect(providers.avax),
+  avax: new ethers.Wallet(AVAX_DEPLOY_KEY).connect(providers.avax),
+  sepolia: new ethers.Wallet(SEPOLIA_DEPLOY_KEY).connect(providers.sepolia),
 };
 
 function sleep(ms) {
@@ -60,10 +64,15 @@ function getChainId(network) {
 
 async function getFrameSigner(options) {
   try {
-    const frame = new ethers.providers.JsonRpcProvider(
-      "https://rpc.ankr.com/eth_sepolia"
-    );
-    const signer = frame.getSigner();
+    // const frame = new ethers.providers.JsonRpcProvider(
+    //   "https://rpc.ankr.com/eth_sepolia"
+    // );
+    // const signer = frame.getSigner();
+
+    // updates
+    // signer from to ethers.getSigners() accounts #0 = admin
+    const [deployer] = await ethers.getSigners();
+    const signer = deployer;
     let networkToCheck = network;
     if (options && options.network) {
       networkToCheck = options.network;

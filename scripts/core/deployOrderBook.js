@@ -1,32 +1,40 @@
-const { deployContract, contractAt , sendTxn, writeTmpAddresses } = require("../shared/helpers")
-const { expandDecimals } = require("../../test/shared/utilities")
+const {
+  deployContract,
+  contractAt,
+  sendTxn,
+  writeTmpAddresses,
+} = require("../shared/helpers");
+const { expandDecimals } = require("../../test/shared/utilities");
 
-const network = (process.env.HARDHAT_NETWORK || 'mainnet');
-const tokens = require('./tokens')[network];
+const network = process.env.HARDHAT_NETWORK || "mainnet";
+const tokens = require("./tokens")[network];
 
 async function main() {
-  const { nativeToken } = tokens
+  const { nativeToken } = tokens;
 
   const orderBook = await deployContract("OrderBook", []);
 
   // Arbitrum mainnet addresses
-  await sendTxn(orderBook.initialize(
-    "0x5F719c2F1095F7B9fc68a68e35B51194f4b6abe8", // router
-    "0x9ab2De34A33fB459b538c43f251eB825645e8595", // vault
-    nativeToken.address, // weth
-    "0xc0253c3cC6aa5Ab407b5795a04c28fB063273894", // usdg
-    "10000000000000000", // 0.01 AVAX
-    expandDecimals(10, 30) // min purchase token amount usd
-  ), "orderBook.initialize");
+  await sendTxn(
+    orderBook.initialize(
+      "0xf6447de9988F36C0E74fb3991E1d001DB7A1bec8", // router
+      "0x7531626E87BdA9B8511bea536136e5349EDacE89", // vault
+      nativeToken.address, // weth
+      "0x8D0851FA4c49336BDD2606C6C7B3783755ea8827", // usdg
+      "10000000000000000", // 0.01 AVAX
+      expandDecimals(10, 30) // min purchase token amount usd
+    ),
+    "orderBook.initialize"
+  );
 
   writeTmpAddresses({
-    orderBook: orderBook.address
-  })
+    orderBook: orderBook.address,
+  });
 }
 
 main()
   .then(() => process.exit(0))
-  .catch(error => {
-    console.error(error)
-    process.exit(1)
-  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

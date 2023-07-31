@@ -16,6 +16,9 @@ async function main() {
     glpManager,
     vault,
     gmx,
+    esGMX,
+    sGMX,
+    sGmxDistributor,
     usdg,
     router,
     vaultErrorController,
@@ -82,9 +85,11 @@ async function main() {
   //       "vaultPriceFeed.setChainlinkFlags"
   //     );
   //   }
-  //   const { btc, eth, link, dai, usdc } = tokens;
-  //   const tokenArr = [btc, eth, link, dai, usdc];
+  const { btc, eth, link, dai, usdc } = tokens;
+  //   const tokenArr = [eth, link, dai, usdc];
   //   const fastPriceTokens = [btc, eth, link];
+  const tokenArr = [eth];
+  const fastPriceTokens = [eth];
 
   //   const updater1 = { address: "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471" };
   //   const updater2 = { address: "0xA4091e09eB027F1e5D397659bfC7D73CdDdCa276" };
@@ -96,29 +101,49 @@ async function main() {
   //     keeper1.address,
   //     keeper2.address,
   //   ];
-
+  //   console.log(await vaultPriceFeed.gov());
   //   for (const [i, tokenItem] of tokenArr.entries()) {
   //     if (tokenItem.spreadBasisPoints === undefined) {
   //       continue;
   //     }
+  //     // await sendTxn(
+  //     //   vaultPriceFeed.setSpreadBasisPoints(
+  //     //     tokenItem.address, // _token
+  //     //     tokenItem.spreadBasisPoints // _spreadBasisPoints
+  //     //   ),
+  //     //   `vaultPriceFeed.setSpreadBasisPoints(${tokenItem.name}) ${tokenItem.spreadBasisPoints}`
+  //     // );
   //     await sendTxn(
-  //       vaultPriceFeed.setSpreadBasisPoints(
+  //       priceFeedTimelock.setSpreadBasisPoints(
+  //         vaultPriceFeed.address,
   //         tokenItem.address, // _token
   //         tokenItem.spreadBasisPoints // _spreadBasisPoints
   //       ),
-  //       `vaultPriceFeed.setSpreadBasisPoints(${tokenItem.name}) ${tokenItem.spreadBasisPoints}`
+  //       `priceFeedTimelock.setSpreadBasisPoints(${tokenItem.name}) ${tokenItem.spreadBasisPoints}`
   //     );
   //   }
 
+  //   console.log(await priceFeedTimelock.admin());
+  //   console.log(await vaultPriceFeed.gov());
   //   for (const token of tokenArr) {
+  //     // await sendTxn(
+  //     //   vaultPriceFeed.setTokenConfig(
+  //     //     token.address, // _token
+  //     //     token.priceFeed, // _priceFeed
+  //     //     token.priceDecimals, // _priceDecimals
+  //     //     token.isStrictStable // _isStrictStable
+  //     //   ),
+  //     //   `vaultPriceFeed.setTokenConfig(${token.name}) ${token.address} ${token.priceFeed}`
+  //     // );
   //     await sendTxn(
-  //       vaultPriceFeed.setTokenConfig(
+  //       priceFeedTimelock.priceFeedSetTokenConfig(
+  //         vaultPriceFeed.address,
   //         token.address, // _token
   //         token.priceFeed, // _priceFeed
   //         token.priceDecimals, // _priceDecimals
   //         token.isStrictStable // _isStrictStable
   //       ),
-  //       `vaultPriceFeed.setTokenConfig(${token.name}) ${token.address} ${token.priceFeed}`
+  //       `priceFeedTimelock.setTokenConfig(${token.name}) ${token.address} ${token.priceFeed}`
   //     );
   //   }
 
@@ -150,8 +175,16 @@ async function main() {
   //     secondaryPriceFeed.setSpreadBasisPointsIfChainError(500),
   //     "secondaryPriceFeed.setSpreadBasisPointsIfChainError"
   //   );
+  //   console.log(await secondaryPriceFeed.gov());
   //   await sendTxn(
   //     secondaryPriceFeed.setMaxCumulativeDeltaDiffs(
+  //       fastPriceTokens.map((t) => t.address),
+  //       fastPriceTokens.map((t) => t.maxCumulativeDeltaDiff)
+  //     ),
+  //     "secondaryPriceFeed.setMaxCumulativeDeltaDiffs"
+  //   );
+  //   await sendTxn(
+  //     priceFeedTimelock.setMaxCumulativeDeltaDiffs(
   //       fastPriceTokens.map((t) => t.address),
   //       fastPriceTokens.map((t) => t.maxCumulativeDeltaDiff)
   //     ),
@@ -192,6 +225,12 @@ async function main() {
   //   await sendTxn(
   //     glp.setInPrivateTransferMode(true),
   //     "glp.setInPrivateTransferMode"
+  //   );
+
+  // initialize esGMX
+  //   await sendTxn(
+  //     esGMX.setInPrivateTransferMode(true),
+  //     "esGmx.setInPrivateTransferMode"
   //   );
 
   // initialize GLPManager
@@ -352,6 +391,21 @@ async function main() {
   //       "positionManager.setGov"
   //     );
   //   }
+
+  // initialize sGMX sGmxDistributor
+  //   const stakedGmxTracker = sGMX;
+  //   const stakedGmxDistributor = sGmxDistributor;
+  //   await sendTxn(
+  //     stakedGmxTracker.initialize(
+  //       [gmx.address, esGMX.address],
+  //       stakedGmxDistributor.address
+  //     ),
+  //     "stakedGmxTracker.initialize"
+  //   );
+  //   await sendTxn(
+  //     stakedGmxDistributor.updateLastDistributionTime(),
+  //     "stakedGmxDistributor.updateLastDistributionTime"
+  //   );
 
   // initialize ReferralStorage
   //   await sendTxn(
