@@ -209,6 +209,11 @@ async function getSepoliaValues(signer) {
     }
   );
 
+  const router = await contractAt(
+    "Router",
+    "0xf6447de9988F36C0E74fb3991E1d001DB7A1bec8"
+  );
+
   const fastPriceEvents = await deployContract("FastPriceEvents", []);
   //   const fastPriceEvents = await contractAt(
   //     "FastPriceEvents",

@@ -1,0 +1,330 @@
+const {
+  getFrameSigner,
+  deployContract,
+  contractAt,
+  sendTxn,
+  sleep,
+} = require("../shared/helpers");
+
+const {
+  getBlockTime,
+  getPriceBits,
+  expandDecimals,
+} = require("../../test/shared/utilities");
+const { toUsd } = require("../../test/shared/units");
+const { errors } = require("../../test/core/Vault/helpers");
+const { Signer } = require("ethers");
+
+const network = process.env.HARDHAT_NETWORK || "mainnet";
+const tokens = require("./tokens")[network];
+
+// use(solidity);
+
+async function getSepoliaValues() {
+  const { btc, eth, link } = tokens;
+  const tokenArr = [btc, eth, link];
+  const vaultPriceFeed = await contractAt(
+    "VaultPriceFeed",
+    "0x57B4FA59741f3E59784ba4dc54deA5Ad610B0Dd4"
+  );
+
+  const positionUtils = await contractAt(
+    "PositionUtils",
+    "0x811B1AE2A6addF28e39cD189a56F2413a7c69f5E"
+  );
+
+  const positionRouter = await contractAt(
+    "PositionRouter",
+    "0xFb0342D3cf1Ba81fc336195c4Ed6626eAb8e402B",
+    null,
+    {
+      libraries: {
+        PositionUtils: positionUtils.address,
+      },
+    }
+  );
+
+  return { vaultPriceFeed, positionRouter, tokenArr };
+}
+
+async function getValues() {
+  if (network === "sepolia") {
+    return getSepoliaValues();
+  }
+}
+
+async function main() {
+  const signer = await getFrameSigner();
+
+  const { vaultPriceFeed, positionRouter, tokenArr } = await getValues(signer);
+
+  const vault = await contractAt(
+    "Vault",
+    "0x7531626E87BdA9B8511bea536136e5349EDacE89"
+  );
+  const timelock = await contractAt("Timelock", await vault.gov());
+  //   const orderbook = await contractAt(
+  //     "OrderBook",
+  //     "0x759CEae223ddb16eE8494D7b4030650a0D40c360"
+  //   );
+  //   console.log("minExecutionFee", await orderbook.minExecutionFee());
+  const secondaryPriceFeed = await contractAt(
+    "FastPriceFeed",
+    await vaultPriceFeed.secondaryPriceFeed()
+  );
+  //   console.log(
+  //     "getPriceData",
+  //     await secondaryPriceFeed.getPriceData(
+  //       "0xdd9D0b2e8eE0552ee93AAEd6af62D386bF19b70E"
+  //     )
+  //   );
+  //   console.log(
+  //     "fastPrice",
+  //     await secondaryPriceFeed.prices(
+  //       "0xdd9D0b2e8eE0552ee93AAEd6af62D386bF19b70E"
+  //     )
+  //   );
+  //   console.log(
+  //     "guaranteedUsd",
+  //     await vault.guaranteedUsd("0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1")
+  //   );
+  //   console.log(
+  //     "getMaxPrice",
+  //     await vault.getMaxPrice("0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1")
+  //   );
+  while (true) {
+    const keysIndex = await positionRouter.getRequestQueueLengths();
+    //   for (let i of keysIndex) {
+    //     console.log(i.toString());
+    //   }
+    //   const key1 = await positionRouter.getRequestKey(signer.address, 17);
+    //   const key = await positionRouter.increasePositionRequestKeys(23);
+    //   console.log("getRequestKey", key1);
+    //   console.log(
+    //     "increasePositionRequests",
+    //     await positionRouter.increasePositionRequests(key)
+    //   );
+
+    //   await sendTxn(
+    //     positionRouter.setPositionKeeper(signer.address, true),
+    //     "positionRouter.executeDecreasePositions(key, executionFeeReceiver)"
+    //   );
+    //   console.log(
+    //     "isPositionKeeper",
+    //     await positionRouter.isPositionKeeper(secondaryPriceFeed.address)
+    //   );
+
+    //   const key = await positionRouter.decreasePositionRequestKeys(5);
+    //   const key = await positionRouter.increasePositionRequestKeys(35);
+    //   console.log("increasePositionRequestKeys", key);
+    //   console.log(
+    //     "increasePositionRequests",
+    //     await positionRouter.increasePositionRequests(key)
+    //   );
+    //   console.log("minTimeDelayPublic", await positionRouter.minTimeDelayPublic());
+    //   console.log(
+    //     "minBlockDelayKeeper",
+    //     await positionRouter.minBlockDelayKeeper()
+    //   );
+    //   console.log(
+    //     "getMaxPrice",
+    //     await vault.getMaxPrice("0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1")
+    //   );
+    //   return;
+    //   await sendTxn(
+    //     positionRouter.executeIncreasePosition(key, signer.address, {
+    //       gasPrice: "1434896730",
+    //       gasLimit: "1262636",
+    //     }),
+    //     "positionRouter.executeIncreasePosition(key, executionFeeReceiver)",
+    //     signer
+    //   );
+    //   return;
+    //   await sendTxn(
+    //     await positionRouter.executeIncreasePositions(
+    //       keysIndex[1].toString(),
+    //       signer.address
+    //     ),
+    //     "positionRouter.executeIncreasePosition(key, executionFeeReceiver)",
+    //     signer
+    //   );
+    //   //   return;
+    //   await sendTxn(
+    //     await positionRouter.executeDecreasePositions(
+    //       keysIndex[3].toString(),
+    //       signer.address
+    //     ),
+    //     "positionRouter.executeDecreasePositions(key, executionFeeReceiver)",
+    //     signer
+    //   );
+    //   return;
+    // await sendTxn(
+    //   await positionRouter.executeDecreasePosition(key, signer.address, {
+    //     gasPrice: "1434896730",
+    //     gasLimit: "1262636",
+    //   }),
+    //   "positionRouter.executeDecreasePositions(key, executionFeeReceiver)",
+    //   signer
+    // );
+    // return;
+    //   const router = await contractAt(
+    //     "Router",
+    //     "0xf6447de9988F36C0E74fb3991E1d001DB7A1bec8"
+    //   );
+    //   //   approvedPlugins
+    //   console.log(await router.plugins(positionRouter.address));
+    //   console.log(
+    //     await router.approvedPlugins(signer.address, positionRouter.address)
+    //   );
+    //   console.log("admin", await positionRouter.admin());
+    //   await sendTxn(
+    //     positionRouter.setPositionKeeper
+    //     secondaryPriceFeed.setPricesWithBitsAndExecute(
+    //       positionRouter.address,
+    //       priceBits,
+    //       blockTime,
+    //       endIndexForIncreasePositions,
+    //       endIndexForDecreasePositions,
+    //       maxIncreasePositions,
+    //       maxDecreasePositions
+    //     ),
+    //     "secondaryPriceFeed.setPricesWithBitsAndExecute(positionRouter, priceBits, timestamp, endIndexForIncreasePositions, endIndexForDecreasePositions, maxIncreasePositions, maxDecreasePositions)"
+    //   );
+    //   console.log("maxTimeDelay", await positionRouter.maxTimeDelay());
+    //   console.log("isLeverageEnabled", await positionRouter.isLeverageEnabled());
+    //   console.log(
+    //     "isPositionKeeper",
+    //     await positionRouter.isPositionKeeper(secondaryPriceFeed.address)
+    //   );
+    //   console.log(
+    //     "minBlockDelayKeeper",
+    //     await positionRouter.minBlockDelayKeeper()
+    //   );
+    //   console.log(
+    //     "maxGlobalLongSizes",
+    //     await positionRouter.maxGlobalLongSizes(
+    //       "0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1"
+    //     )
+    //   );
+    //   const vault = await contractAt(
+    //     "Vault",
+    //     "0x7531626E87BdA9B8511bea536136e5349EDacE89"
+    //   );
+    //   const timelock = await contractAt("Timelock", await vault.gov());
+    //   console.log(
+    //     "guaranteedUsd",
+    //     await vault.guaranteedUsd("0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1")
+    //   );
+    //   console.log(
+    //     "getMaxPrice",
+    //     await vault.getMaxPrice("0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1")
+    //   );
+
+    //   console.log("vault isLeverageEnabled", await vault.isLeverageEnabled());
+    //   //   console.log("vault maxGasPrice", await vault.maxGasPrice());
+    //   console.log("vault vaultUtils", await vault.vaultUtils());
+    //   console.log("vault fundingInterval", await vault.fundingInterval());
+    //   console.log(
+    //     "vault lastFundingTimes",
+    //     await vault.lastFundingTimes("0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1")
+    //   );
+
+    //   const shortsTracker = await contractAt(
+    //     "ShortsTracker",
+    //     "0x3bB314A3106A324342EB6c8F62AF94c8231736CE"
+    //   );
+    //   console.log(
+    //     "shortsTracker",
+    //     await shortsTracker.isHandler("0xFb0342D3cf1Ba81fc336195c4Ed6626eAb8e402B")
+    //   );
+    //   console.log(
+    //     "timelock",
+    //     await timelock.isHandler("0xFb0342D3cf1Ba81fc336195c4Ed6626eAb8e402B")
+    //   );
+    //   await sendTxn(
+    //     timelock.setContractHandler(positionRouter.address, true),
+    //     "timelock.setContractHandler(PositionRouter, true)"
+    //   );
+    //   await sendTxn(
+    //     timelock.setContractHandler(
+    //       "0x811B1AE2A6addF28e39cD189a56F2413a7c69f5E",
+    //       true
+    //     ),
+    //     "timelock.setContractHandler(PositionRouter, true)"
+    //   );
+    //   console.log("shortsTracker timelock", await shortsTracker.gov());
+    //   await sendTxn(
+    //     shortsTracker.setHandler(positionRouter.address, true),
+    //     "shortsTracker.setContractHandler(positionUtils, true)"
+    //   );
+    //   console.log("shortsTracker", await positionRouter.shortsTracker());
+
+    //   await sendTxn(
+    //     vault.setGov("0x5144CF1f6C14D0ec2099cE740bB45DD2286F172A"),
+    //     "vault.setGov(timelock)"
+    //   );
+
+    //   const maxGasPrice = "20000000000"; // 20 gwei
+    //   await sendTxn(
+    //     timelock.setMaxGasPrice(vault.address, maxGasPrice),
+    //     "timelock.setMaxGasPrice(vault.address, maxGasPrice)"
+    //   );
+    //   console.log("vault gov", await vault.gov());
+    //   tokens
+    // 0: BTC
+    // 1: ETH
+    // 2: LINK
+    const prices = [];
+    for (let i in tokenArr) {
+      const tokenItem = tokenArr[i];
+      const priceFeed = await contractAt("PriceFeed", tokenItem.priceFeed);
+      const price = await priceFeed.latestAnswer();
+      console.log(price.toString());
+      prices[i] = price.div(10 ** 5).toString();
+      // prices2[i] = price.div(10 ** 2).toString();
+    }
+    //   console.log(prices);
+    //   return;
+    const provider = waffle.provider;
+
+    const blockTime = await getBlockTime(provider);
+    const priceBits = getPriceBits(prices);
+    //   const priceBits2 = getPriceBits(prices2);
+    //   const priceBits = "485430951856681143989754809661621";
+    //   console.log(priceBits);
+    //   console.log(priceBits2);
+    //   return;
+    //   return;
+    const endIndexForIncreasePositions = keysIndex[1].toString();
+    const endIndexForDecreasePositions = keysIndex[3].toString();
+    const maxIncreasePositions = endIndexForIncreasePositions;
+    const maxDecreasePositions = endIndexForDecreasePositions;
+    //   const tokens = await secondaryPriceFeed.tokens(4);
+    await sendTxn(
+      secondaryPriceFeed.setPricesWithBitsAndExecute(
+        positionRouter.address,
+        priceBits,
+        blockTime,
+        endIndexForIncreasePositions,
+        endIndexForDecreasePositions,
+        maxIncreasePositions,
+        maxDecreasePositions,
+        {
+          gasPrice: "1434896730",
+          gasLimit: "12626360",
+        }
+      ),
+      "secondaryPriceFeed.setPricesWithBitsAndExecute(positionRouter, priceBits, timestamp, endIndexForIncreasePositions, endIndexForDecreasePositions, maxIncreasePositions, maxDecreasePositions)",
+      signer
+    );
+
+    await sleep(24000);
+  }
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

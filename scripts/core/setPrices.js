@@ -1,26 +1,47 @@
-const { deployContract, contractAt , sendTxn } = require("../shared/helpers")
-const { expandDecimals } = require("../../test/shared/utilities")
-const { toUsd } = require("../../test/shared/units")
+const { deployContract, contractAt, sendTxn } = require("../shared/helpers");
+const { getBlockTime, expandDecimals } = require("../../test/shared/utilities");
+const { toUsd } = require("../../test/shared/units");
 
-const network = (process.env.HARDHAT_NETWORK || 'mainnet');
-const tokens = require('./tokens')[network];
+const network = process.env.HARDHAT_NETWORK || "mainnet";
+const tokens = require("./tokens")[network];
 
 async function main() {
-  const secondaryPriceFeed = await contractAt("FastPriceFeed", "0x06588aad1eCc1275CBF68ab192257714ac1ed89c")
-  const vaultPriceFeed = await contractAt("VaultPriceFeed", "0x82B1Fa2741a6591D30E61830b1CfDA0E7ba3ABd3")
+  const secondaryPriceFeed = await contractAt(
+    "FastPriceFeed",
+    "0x7657D54d16a2016FD3c0B6d12251Cd8b06a3FA2E"
+  );
+  const vaultPriceFeed = await contractAt(
+    "VaultPriceFeed",
+    "0x57B4FA59741f3E59784ba4dc54deA5Ad610B0Dd4"
+  );
 
   // await sendTxn(vaultPriceFeed.setIsAmmEnabled(false), "vaultPriceFeed.setIsAmmEnabled")
   // console.log("vaultPriceFeed.isSecondaryPriceEnabled", await vaultPriceFeed.isSecondaryPriceEnabled())
 
-  await sendTxn(secondaryPriceFeed.setPrices(
-    [tokens.btc.address, tokens.eth.address, tokens.bnb.address],
-    [expandDecimals(35000, 30), expandDecimals(4000, 30), expandDecimals(310, 30)]
-  ), "secondaryPriceFeed.setPrices")
+  const provider = waffle.provider;
+
+  const blockTime = await getBlockTime(provider);
+  await sendTxn(
+    secondaryPriceFeed.setPrices(
+      [tokens.btc.address, tokens.eth.address, tokens.link.address],
+      [
+        expandDecimals(29171, 30),
+        expandDecimals(1836, 30),
+        expandDecimals(7, 30),
+      ],
+      blockTime,
+      {
+        gasPrice: "1434896730",
+        gasLimit: "1262636",
+      }
+    ),
+    "secondaryPriceFeed.setPrices"
+  );
 }
 
 main()
   .then(() => process.exit(0))
-  .catch(error => {
-    console.error(error)
-    process.exit(1)
-  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

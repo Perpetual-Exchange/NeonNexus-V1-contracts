@@ -1,17 +1,25 @@
-const { contractAt , sendTxn, callWithRetries } = require("../shared/helpers")
-const { expandDecimals } = require("../../test/shared/utilities")
+const { contractAt, sendTxn } = require("../shared/helpers");
+const { expandDecimals } = require("../../test/shared/utilities");
 
 async function main() {
-  const router = await callWithRetries(contractAt, ["Router", "0x526f42EA12E167E36E3De747187f53b6989d121A"])
+  const router = await contractAt(
+    "Router",
+    "0xf6447de9988F36C0E74fb3991E1d001DB7A1bec8"
+  );
 
-  await sendTxn(callWithRetries(router.addPlugin.bind(router), [
-    "0x84B1FEA4A2c1e0C07f34755ac4cf5aD26a07485d"
-  ]), "router.addPlugin")
+  await sendTxn(
+    router.addPlugin("0x759CEae223ddb16eE8494D7b4030650a0D40c360"),
+    "router.addPlugin"
+  );
+  //   await sendTxn(
+  //     router.approvePlugin("", "0x759CEae223ddb16eE8494D7b4030650a0D40c360"),
+  //     "router.approvePlugin"
+  //   );
 }
 
 main()
   .then(() => process.exit(0))
-  .catch(error => {
-    console.error(error)
-    process.exit(1)
-  })
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
