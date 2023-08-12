@@ -52,9 +52,15 @@ async function main() {
     );
     const distributorAddr = await tracker.distributor();
     console.log("distributorAddr", distributorAddr);
+
     const distributor = await contractAt("RewardDistributor", distributorAddr);
     const pendingRewards = await distributor.pendingRewards();
     console.log("distributor.pendingRewards: ", pendingRewards.toString());
+    const lastDistributionTime = await distributor.lastDistributionTime();
+    console.log(
+      "distributor.lastDistributionTime: ",
+      lastDistributionTime.toString()
+    );
 
     console.log(
       "0==>rewardTracker.claimable: ",
