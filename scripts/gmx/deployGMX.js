@@ -12,7 +12,7 @@ async function main() {
   //     "GMX",
   //     "0x0C038276cd0089e58C2fc5d7CB6e7565Ca14650a"
   //   );
-  //   await deployContract("GMX", []);
+  await deployContract("GMX", []);
 
   //   await sendTxn(
   //     gmx.setMinter(minter.address, true),
@@ -54,28 +54,28 @@ async function main() {
   //     await sendTxn(esGmx.mint(sender, amount), "gmx.mint(sender, true)");
   //   }
 
-  const reader = await contractAt(
-    "Reader",
-    "0x7C4c161a923dF21b1dd1d62b8620Ea24d6E928c4"
-  );
-  const pr = await contractAt(
-    "PositionRouter",
-    "0xFb0342D3cf1Ba81fc336195c4Ed6626eAb8e402B",
-    null,
-    {
-      libraries: {
-        PositionUtils: "0x811B1AE2A6addF28e39cD189a56F2413a7c69f5E",
-      },
-    }
-  );
-  const key = await pr.getRequestKey(
-    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471",
-    1
-  );
-  const data = await pr.increasePositionRequests(
-    "0x524f666cf739da9f19964f0ad12dd2a0ffa9bc3316055018167e691bedcb7ad5"
-  );
-  console.log("data:", data);
+  //   const reader = await contractAt(
+  //     "Reader",
+  //     "0x7C4c161a923dF21b1dd1d62b8620Ea24d6E928c4"
+  //   );
+  //   const pr = await contractAt(
+  //     "PositionRouter",
+  //     "0xFb0342D3cf1Ba81fc336195c4Ed6626eAb8e402B",
+  //     null,
+  //     {
+  //       libraries: {
+  //         PositionUtils: "0x811B1AE2A6addF28e39cD189a56F2413a7c69f5E",
+  //       },
+  //     }
+  //   );
+  //   const key = await pr.getRequestKey(
+  //     "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471",
+  //     1
+  //   );
+  //   const data = await pr.increasePositionRequests(
+  //     "0x524f666cf739da9f19964f0ad12dd2a0ffa9bc3316055018167e691bedcb7ad5"
+  //   );
+  //   console.log("data:", data);
   //   const positions = await reader.getPositions(
   //     "0x7531626E87BdA9B8511bea536136e5349EDacE89",
   //     "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471",
