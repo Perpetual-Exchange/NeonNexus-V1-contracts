@@ -83,25 +83,25 @@ async function getValues() {
 
 async function main() {
   const { positionRouter, positionManager } = await getValues();
-  //   const referralStorage = await deployContract("ReferralStorage", []);
-  const referralStorage = await contractAt(
-    "ReferralStorage",
-    await positionRouter.referralStorage()
-  );
+  const referralStorage = await deployContract("ReferralStorage", []);
+  //   const referralStorage = await contractAt(
+  //     "ReferralStorage",
+  //     await positionRouter.referralStorage()
+  //   );
 
-  await sendTxn(
-    positionRouter.setReferralStorage(referralStorage.address),
-    "positionRouter.setReferralStorage"
-  );
-  await sendTxn(
-    positionManager.setReferralStorage(referralStorage.address),
-    "positionManager.setReferralStorage"
-  );
+  //   await sendTxn(
+  //     positionRouter.setReferralStorage(referralStorage.address),
+  //     "positionRouter.setReferralStorage"
+  //   );
+  //   await sendTxn(
+  //     positionManager.setReferralStorage(referralStorage.address),
+  //     "positionManager.setReferralStorage"
+  //   );
 
-  await sendTxn(
-    referralStorage.setHandler(positionRouter.address, true),
-    "referralStorage.setHandler(positionRouter)"
-  );
+  //   await sendTxn(
+  //     referralStorage.setHandler(positionRouter.address, true),
+  //     "referralStorage.setHandler(positionRouter)"
+  //   );
 }
 
 main()

@@ -31,22 +31,26 @@ async function main() {
     "0x3bB314A3106A324342EB6c8F62AF94c8231736CE"
   );
 
-  const glpManager = await deployContract("GlpManager", [
-    vault.address,
-    usdg.address,
-    glp.address,
-    shortsTracker.address,
-    15 * 60,
-  ]);
+  const glpManager = await contractAt(
+    "GlpManager",
+    "0x5f752c0f80725fEF5B1bC45cf0dd6670E5b542aC"
+  );
+  //   const glpManager = await deployContract("GlpManager", [
+  //     vault.address,
+  //     usdg.address,
+  //     glp.address,
+  //     shortsTracker.address,
+  //     15 * 60,
+  //   ]);
 
   await sendTxn(
     glpManager.setInPrivateMode(true),
     "glpManager.setInPrivateMode"
   );
 
-  await sendTxn(glp.setMinter(glpManager.address, true), "glp.setMinter");
-  await sendTxn(usdg.addVault(glpManager.address), "usdg.addVault");
-  await sendTxn(vault.setManager(glpManager.address, true), "vault.setManager");
+  //   await sendTxn(glp.setMinter(glpManager.address, true), "glp.setMinter");
+  //   await sendTxn(usdg.addVault(glpManager.address), "usdg.addVault");
+  //   await sendTxn(vault.setManager(glpManager.address, true), "vault.setManager");
 
   writeTmpAddresses({
     glpManager: glpManager.address,
