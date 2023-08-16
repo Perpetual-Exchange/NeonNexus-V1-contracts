@@ -12,8 +12,9 @@ const {
   expandDecimals,
 } = require("../../test/shared/utilities");
 const { toUsd } = require("../../test/shared/units");
-const { errors } = require("../../test/core/Vault/helpers");
-const { Signer } = require("ethers");
+const {AVAX_TESTNET_URL} = require("../../env.json");
+// const { errors } = require("../../test/core/Vault/helpers");
+// const { Signer } = require("ethers");
 
 const network = process.env.HARDHAT_NETWORK || "mainnet";
 const tokens = require("./tokens")[network];
@@ -47,9 +48,39 @@ async function getSepoliaValues() {
   return { vaultPriceFeed, positionRouter, tokenArr };
 }
 
+async function getAvaxTestValues() {
+  const { btc, eth, link, avax, usdt } = tokens;
+  const tokenArr = [btc, eth, link, avax, usdt];
+  const vaultPriceFeed = await contractAt(
+    "VaultPriceFeed",
+    "0x78DE129cD082805Ff5c4e728Eb861364341B4F63"
+  );
+
+  const positionUtils = await contractAt(
+    "PositionUtils",
+    "0x04Eb210750C9696A040333a7FaeeE791c945249E"
+  );
+
+  const positionRouter = await contractAt(
+    "PositionRouter",
+    "0x3cFF0ef03dF66b198E99AF2bF0d04bc537F06C00",
+    null,
+    {
+      libraries: {
+        PositionUtils: positionUtils.address,
+      },
+    }
+  );
+
+  return { vaultPriceFeed, positionRouter, tokenArr };
+}
+
 async function getValues() {
   if (network === "sepolia") {
     return getSepoliaValues();
+  }
+  if (network === "avaxtest") {
+    return getAvaxTestValues();
   }
 }
 
@@ -60,7 +91,7 @@ async function main() {
 
   const vault = await contractAt(
     "Vault",
-    "0x7531626E87BdA9B8511bea536136e5349EDacE89"
+    "0xAC6E2Ac93E2a1CFFadE96607fe2376F5f5952EDC"
   );
   const timelock = await contractAt("Timelock", await vault.gov());
   //   const orderbook = await contractAt(
@@ -94,9 +125,9 @@ async function main() {
   //   );
   while (true) {
     const keysIndex = await positionRouter.getRequestQueueLengths();
-    //   for (let i of keysIndex) {
-    //     console.log(i.toString());
-    //   }
+      // for (let i of keysIndex) {
+      //   console.log("keysIndex:", i.toString());
+      // }
     //   const key1 = await positionRouter.getRequestKey(signer.address, 17);
     //   const key = await positionRouter.increasePositionRequestKeys(23);
     //   console.log("getRequestKey", key1);
@@ -286,9 +317,12 @@ async function main() {
     //   console.log(prices);
     //   return;
     const provider = waffle.provider;
+    // console.log(provider);
 
     const blockTime = await getBlockTime(provider);
+    // console.log("blockTime:", blockTime);
     const priceBits = getPriceBits(prices);
+    // console.log("priceBits:", priceBits);
     //   const priceBits2 = getPriceBits(prices2);
     //   const priceBits = "485430951856681143989754809661621";
     //   console.log(priceBits);
