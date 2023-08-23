@@ -32,6 +32,14 @@ async function getSepoliaValues() {
   return { tokenManager };
 }
 
+async function getAvaxTestValues() {
+  const tokenManager = {
+    address: "0x7199734D2CC6bC4eB45Ebe251539a4CEDde2d2D4",
+  };
+
+  return { tokenManager };
+}
+
 async function getValues() {
   if (network === "arbitrum") {
     return getArbValues();
@@ -44,12 +52,16 @@ async function getValues() {
   if (network === "sepolia") {
     return getSepoliaValues();
   }
+
+  if (network === "avaxtest") {
+    return getAvaxTestValues();
+  }
 }
 
 async function main() {
   const signer = await getFrameSigner();
 
-  const admin = "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471";
+  const admin = "0xAcdC274B853e01e9666E03c662d30A83B8F73080";
   const buffer = 24 * 60 * 60;
 
   const { tokenManager } = await getValues();
@@ -74,8 +86,8 @@ async function main() {
   //     "0x6091646D0354b03DD1e9697D33A7341d8C93a6F5", // xhiroz
   //   ];
   const signers = [
-    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu1
-    "0x083102dEc08D0a449bEd627bE204531bf34251Ae", // xiaowu2
+    "0xAcdC274B853e01e9666E03c662d30A83B8F73080", // paul
+    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu
     "0xc7816AB57762479dCF33185bad7A1cFCb68a7997",
     "0x34d0B59D2E1262FD04445F7768F649fF6DC431a7",
     "0x1Ce32739c33Eecb06dfaaCa0E42bd04E56CCbF0d",
@@ -90,7 +102,7 @@ async function main() {
   }
 
   const keepers = [
-    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // Xiaowu
+    "0xAcdC274B853e01e9666E03c662d30A83B8F73080", // paul
   ];
 
   for (let i = 0; i < keepers.length; i++) {

@@ -11,21 +11,29 @@ const {
   ARBITRUM_URL,
   AVAX_URL,
   SEPOLIA_URL,
+  AVAX_TESTNET_URL,
+  OPSIDE_TESTNET_URL,
   ARBITRUM_DEPLOY_KEY,
   AVAX_DEPLOY_KEY,
   SEPOLIA_DEPLOY_KEY,
+  AVAX_TESTNET_DEPLOY_KEY,
+  OPSIDE_TESTNET_DEPLOY_KEY,
 } = require("../../env.json");
 
 const providers = {
   arbitrum: new ethers.providers.JsonRpcProvider(ARBITRUM_URL),
   avax: new ethers.providers.JsonRpcProvider(AVAX_URL),
   sepolia: new ethers.providers.JsonRpcProvider(SEPOLIA_URL),
+  avaxtest: new ethers.providers.JsonRpcProvider(AVAX_TESTNET_URL),
+  opsidetest: new ethers.providers.JsonRpcProvider(OPSIDE_TESTNET_URL),
 };
 
 const signers = {
   arbitrum: new ethers.Wallet(ARBITRUM_DEPLOY_KEY).connect(providers.arbitrum),
   avax: new ethers.Wallet(AVAX_DEPLOY_KEY).connect(providers.avax),
   sepolia: new ethers.Wallet(SEPOLIA_DEPLOY_KEY).connect(providers.sepolia),
+  avaxtest: new ethers.Wallet(AVAX_TESTNET_DEPLOY_KEY).connect(providers.avaxtest),
+  opsidetest: new ethers.Wallet(OPSIDE_TESTNET_DEPLOY_KEY).connect(providers.opsidetest),
 };
 
 function sleep(ms) {
@@ -57,6 +65,14 @@ function getChainId(network) {
 
   if (network === "sepolia") {
     return 11155111;
+  }
+
+  if (network === "avaxtest") {
+    return 43113;
+  }
+
+  if (network === "opsidetest") {
+    return 12020;
   }
 
   throw new Error("Unsupported network");

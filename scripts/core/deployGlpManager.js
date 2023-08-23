@@ -16,19 +16,19 @@ async function main() {
 
   const vault = await contractAt(
     "Vault",
-    "0x7531626E87BdA9B8511bea536136e5349EDacE89"
+    "0xAC6E2Ac93E2a1CFFadE96607fe2376F5f5952EDC"
   );
   const usdg = await contractAt(
     "USDG",
-    "0x8D0851FA4c49336BDD2606C6C7B3783755ea8827"
+    "0x0A2627184A1AA8153A5660159B2762bCc85FF052"
   );
   const glp = await contractAt(
     "GLP",
-    "0x5339340f11789E38F2b4a00C7f29D9c112B3333F"
+    "0x0F02098Bb29FAc827f2DA6b330dB9B423Bd07B84"
   );
   const shortsTracker = await contractAt(
     "ShortsTracker",
-    "0x3bB314A3106A324342EB6c8F62AF94c8231736CE"
+    "0xD82bcA04b31eC58C5C2C62f798aC973A95c278d2"
   );
 
   const glpManager = await contractAt(

@@ -187,6 +187,30 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         uint256 callbackGasLimit
     );
 
+//    event PR1(uint256 endIndex, address executionFeeReceiver, uint256 index, uint256 length);
+//    event PR2(uint256 endIndex, address executionFeeReceiver, uint256 index, uint256 length);
+//    event PR3(uint256 index, bytes32 key);
+//    event PR41(address executionFeeReceiver, bytes32 key);
+    event PR42(uint256 blockNumber, uint256 blockTime, address account);
+    event PR6(bool shouldExecute);
+//    event PR7(uint256 amountIn);
+    event PR71(uint256 length);
+//    event PR72(address account,
+//address[] path,
+//    uint256 amountIn,
+//    address indexToken,
+//    bool isLong,
+//        uint256 sizeDelta);
+//    event PR73(address length1);
+//    event PR74(uint256 executionFee, address executionFeeReceiver);
+//
+//    event PR91(bytes32 key, address executionFeeReceiver);
+//    event PR92(bytes32 key, bool shouldCancel);
+//    event PR93(bytes32 key, string method);
+//    event PR94(bytes32 key, string method);
+//    event PR95(bytes32 key, string method);
+    event PR9(string step);
+
     modifier onlyPositionKeeper() {
         require(isPositionKeeper[msg.sender], "403");
         _;
@@ -272,6 +296,8 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         uint256 index = increasePositionRequestKeysStart;
         uint256 length = increasePositionRequestKeys.length;
 
+//        emit PR1(_endIndex, _executionFeeReceiver, index, length);
+
         if (index >= length) {
             return;
         }
@@ -279,9 +305,11 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         if (_endIndex > length) {
             _endIndex = length;
         }
+//        emit PR2(_endIndex, _executionFeeReceiver, index, length);
 
         while (index < _endIndex) {
             bytes32 key = increasePositionRequestKeys[index];
+//            emit PR3(index, key);
 
             // if the request was executed then delete the key from the array
             // if the request was not executed then break from the loop, this can happen if the
@@ -499,30 +527,41 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         address payable _executionFeeReceiver
     ) public nonReentrant returns (bool) {
         IncreasePositionRequest memory request = increasePositionRequests[_key];
+//        emit PR41(_executionFeeReceiver, _key);
         // if the request was already executed or cancelled, return true so that the executeIncreasePositions loop will continue executing the next request
         if (request.account == address(0)) {
             return true;
         }
 
+//        emit PR42(request.blockNumber, request.blockTime, request.account);
         bool shouldExecute = _validateExecution(
             request.blockNumber,
             request.blockTime,
             request.account
         );
+//        emit PR6(shouldExecute);
         if (!shouldExecute) {
             return false;
         }
 
         delete increasePositionRequests[_key];
 
+//        emit PR7(request.amountIn);
         if (request.amountIn > 0) {
             uint256 amountIn = request.amountIn;
 
+//            emit PR71(request.path.length);
             if (request.path.length > 1) {
                 IERC20(request.path[0]).safeTransfer(vault, request.amountIn);
                 amountIn = _swap(request.path, request.minOut, address(this));
             }
 
+//            emit PR72(request.account,
+//                request.path,
+//                amountIn,
+//                request.indexToken,
+//                request.isLong,
+//                request.sizeDelta);
             uint256 afterFeeAmount = _collectFees(
                 request.account,
                 request.path,
@@ -537,6 +576,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
             );
         }
 
+//        emit PR73(request.path[request.path.length - 1]);
         _increasePosition(
             request.account,
             request.path[request.path.length - 1],
@@ -546,6 +586,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
             request.acceptablePrice
         );
 
+//        emit PR74(request.executionFee, _executionFeeReceiver);
         _transferOutETHWithGasLimitFallbackToWeth(
             request.executionFee,
             _executionFeeReceiver
@@ -574,6 +615,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         bytes32 _key,
         address payable _executionFeeReceiver
     ) public nonReentrant returns (bool) {
+        emit PR9("91");
         IncreasePositionRequest memory request = increasePositionRequests[_key];
         // if the request was already executed or cancelled, return true so that the executeIncreasePositions loop will continue executing the next request
         if (request.account == address(0)) {
@@ -585,6 +627,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
             request.blockTime,
             request.account
         );
+        emit PR9("92");
         if (!shouldCancel) {
             return false;
         }
@@ -592,17 +635,20 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         delete increasePositionRequests[_key];
 
         if (request.hasCollateralInETH) {
+            emit PR9("93");
             _transferOutETHWithGasLimitFallbackToWeth(
                 request.amountIn,
                 payable(request.account)
             );
         } else {
+            emit PR9("94");
             IERC20(request.path[0]).safeTransfer(
                 request.account,
                 request.amountIn
             );
         }
 
+        emit PR9("95");
         _transferOutETHWithGasLimitFallbackToWeth(
             request.executionFee,
             _executionFeeReceiver
@@ -814,6 +860,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         uint256 _positionBlockTime,
         address _account
     ) internal view returns (bool) {
+
         bool isKeeperCall = msg.sender == address(this) ||
             isPositionKeeper[msg.sender];
 

@@ -104,6 +104,38 @@ async function getSepoliaValues() {
   };
 }
 
+async function getAvaxTestValues() {
+  const vault = await contractAt(
+    "Vault",
+    "0xAC6E2Ac93E2a1CFFadE96607fe2376F5f5952EDC"
+  );
+  const tokenManager = {
+    address: "0x7199734D2CC6bC4eB45Ebe251539a4CEDde2d2D4",
+  };
+  const glpManager = { address: "0xA9b3ef6957B061086B41C36eD805Ad23Cac7b099" };
+  const rewardRouter = {
+    address: "0x800db23793bBA846f378296E7b492F731D1eE464",
+  };
+
+  const positionRouter = {
+    address: "0xC940Df5Ea4f80f50Ef7eb6d484dc50Fa66FcA210",
+  };
+  const positionManager = {
+    address: "0x3be98a77a22C954C2ffDf4c47daDa1ff39149889",
+  };
+  const gmx = { address: "0x2CbF0056E15f4Fe2e04691D280D89bA645D6D364" };
+
+  return {
+    vault,
+    tokenManager,
+    glpManager,
+    rewardRouter,
+    positionRouter,
+    positionManager,
+    gmx,
+  };
+}
+
 async function getValues() {
   if (network === "arbitrum") {
     return getArbValues();
@@ -116,12 +148,16 @@ async function getValues() {
   if (network === "sepolia") {
     return getSepoliaValues();
   }
+
+  if (network === "avaxtest") {
+    return getAvaxTestValues();
+  }
 }
 
 async function main() {
   const signer = await getFrameSigner();
 
-  const admin = "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471";
+  const admin = "0xAcdC274B853e01e9666E03c662d30A83B8F73080";
   const buffer = 24 * 60 * 60;
   const maxTokenSupply = expandDecimals("13250000", 18);
 
@@ -188,11 +224,11 @@ async function main() {
   //     "0x6091646D0354b03DD1e9697D33A7341d8C93a6F5" // xhiroz
   //   ]
   const handlers = [
-    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu1
-    "0x083102dEc08D0a449bEd627bE204531bf34251Ae", // xiaowu2
-    "0xc7816AB57762479dCF33185bad7A1cFCb68a7997",
-    "0x34d0B59D2E1262FD04445F7768F649fF6DC431a7",
-    "0x1Ce32739c33Eecb06dfaaCa0E42bd04E56CCbF0d",
+    "0xAcdC274B853e01e9666E03c662d30A83B8F73080", // paul
+    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu
+    // "0xc7816AB57762479dCF33185bad7A1cFCb68a7997",
+    // "0x34d0B59D2E1262FD04445F7768F649fF6DC431a7",
+    // "0x1Ce32739c33Eecb06dfaaCa0E42bd04E56CCbF0d",
   ];
 
   for (let i = 0; i < handlers.length; i++) {
@@ -204,7 +240,7 @@ async function main() {
   }
 
   const keepers = [
-    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // Xiaowu
+    "0xAcdC274B853e01e9666E03c662d30A83B8F73080", // paul
   ];
 
   for (let i = 0; i < keepers.length; i++) {

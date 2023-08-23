@@ -8,13 +8,13 @@ const { expandDecimals } = require("../../test/shared/utilities");
 
 async function main() {
 
-  await deployContract("GMX", []);
+  await deployContract("ODX", []);
 
   // const minter = { address: "0xAcdC274B853e01e9666E03c662d30A83B8F73080" };
   //
   // const gmx = await contractAt(
-  //   "GMX",
-  //   "0x2CbF0056E15f4Fe2e04691D280D89bA645D6D364"
+  //   "ODX",
+  //   "0x7A9a466DE08747bC8Ad79aBA6D8dCE9D64E5C767"
   // );
   //
   // await sendTxn(
@@ -26,7 +26,6 @@ async function main() {
   //   "0xAcdC274B853e01e9666E03c662d30A83B8F73080", // paul
   //   "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu
   //   "0x1Ce32739c33Eecb06dfaaCa0E42bd04E56CCbF0d", // jiagang
-  //   "0x34d0B59D2E1262FD04445F7768F649fF6DC431a7", // shixiong
   //   "0xc7816AB57762479dCF33185bad7A1cFCb68a7997", // kering
   // ];
   // const amount = expandDecimals("10000", 18);
@@ -52,7 +51,6 @@ async function main() {
   //   senders = [
   //     "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu
   //     "0x1Ce32739c33Eecb06dfaaCa0E42bd04E56CCbF0d", // jiagang
-  //     "0x34d0B59D2E1262FD04445F7768F649fF6DC431a7", // shixiong
   //     "0xc7816AB57762479dCF33185bad7A1cFCb68a7997", // kering
   //   ];
   //   const amount = expandDecimals("10000", 18);

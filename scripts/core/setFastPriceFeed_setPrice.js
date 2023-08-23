@@ -12,7 +12,7 @@ const {
   expandDecimals,
 } = require("../../test/shared/utilities");
 const { toUsd } = require("../../test/shared/units");
-const {AVAX_TESTNET_URL} = require("../../env.json");
+const {AVAX_TESTNET_URL, AVAX_TESTNET_DEPLOY_KEY} = require("../../env.json");
 // const { errors } = require("../../test/core/Vault/helpers");
 // const { Signer } = require("ethers");
 
@@ -49,11 +49,11 @@ async function getSepoliaValues() {
 }
 
 async function getAvaxTestValues() {
-  const { btc, eth, link, avax, usdt } = tokens;
-  const tokenArr = [btc, eth, link, avax, usdt];
+  const { btc, eth, avax, link } = tokens;
+  const tokenArr = [btc, eth, avax, link];
   const vaultPriceFeed = await contractAt(
     "VaultPriceFeed",
-    "0x78DE129cD082805Ff5c4e728Eb861364341B4F63"
+    "0x1bA33cE37C460c4437E901334c9FB736b80dDD39"
   );
 
   const positionUtils = await contractAt(
@@ -63,7 +63,7 @@ async function getAvaxTestValues() {
 
   const positionRouter = await contractAt(
     "PositionRouter",
-    "0x3cFF0ef03dF66b198E99AF2bF0d04bc537F06C00",
+    "0xC940Df5Ea4f80f50Ef7eb6d484dc50Fa66FcA210",
     null,
     {
       libraries: {
@@ -85,6 +85,11 @@ async function getValues() {
 }
 
 async function main() {
+  // const provider = new ethers.providers.JsonRpcProvider(AVAX_TESTNET_URL);
+  // const updaterWallet = new ethers.Wallet(AVAX_TESTNET_DEPLOY_KEY).connect(
+  //   provider
+  // );
+
   const signer = await getFrameSigner();
 
   const { vaultPriceFeed, positionRouter, tokenArr } = await getValues(signer);
@@ -123,8 +128,18 @@ async function main() {
   //     "getMaxPrice",
   //     await vault.getMaxPrice("0x7E160F7a1f90E3BfB380eA6Fba9cbD860d7Cd0D1")
   //   );
+
+  console.log("vault:", vault.address);
+  console.log("vaultPriceFeed:", vaultPriceFeed.address);
+  console.log("secondaryPriceFeed:", secondaryPriceFeed.address);
+  console.log("positionRouter:", positionRouter.address);
+
   while (true) {
     const keysIndex = await positionRouter.getRequestQueueLengths();
+    console.log("increasePositionRequestKeysStart:", keysIndex[0].toString());
+    console.log("increasePositionRequestKeys.length:", keysIndex[1].toString());
+    console.log("decreasePositionRequestKeysStart:", keysIndex[2].toString());
+    console.log("decreasePositionRequestKeys.length:", keysIndex[3].toString());
       // for (let i of keysIndex) {
       //   console.log("keysIndex:", i.toString());
       // }
@@ -310,15 +325,15 @@ async function main() {
       const tokenItem = tokenArr[i];
       const priceFeed = await contractAt("PriceFeed", tokenItem.priceFeed);
       const price = await priceFeed.latestAnswer();
-      console.log(price.toString());
       prices[i] = price.div(10 ** 5).toString();
+      console.log(tokenItem.name, "oracle.latest:",price.toString(), "dividedPrice:", prices[i]);
+
       // prices2[i] = price.div(10 ** 2).toString();
     }
     //   console.log(prices);
     //   return;
-    const provider = waffle.provider;
-    // console.log(provider);
 
+    const provider = waffle.provider;
     const blockTime = await getBlockTime(provider);
     // console.log("blockTime:", blockTime);
     const priceBits = getPriceBits(prices);
@@ -334,6 +349,9 @@ async function main() {
     const maxIncreasePositions = endIndexForIncreasePositions;
     const maxDecreasePositions = endIndexForDecreasePositions;
     //   const tokens = await secondaryPriceFeed.tokens(4);
+    console.log("priceBits:",priceBits,"blockTime:", blockTime, "endIndexForIncreasePositions:", endIndexForIncreasePositions, "endIndexForDecreasePositions:",
+      endIndexForDecreasePositions, "maxIncreasePositions:", maxIncreasePositions, "maxDecreasePositions:", maxDecreasePositions);
+
     await sendTxn(
       secondaryPriceFeed.setPricesWithBitsAndExecute(
         positionRouter.address,
@@ -344,13 +362,24 @@ async function main() {
         maxIncreasePositions,
         maxDecreasePositions,
         {
-          gasPrice: "1434896730",
+          gasPrice: "25000000000",
           gasLimit: "12626360",
         }
       ),
       "secondaryPriceFeed.setPricesWithBitsAndExecute(positionRouter, priceBits, timestamp, endIndexForIncreasePositions, endIndexForDecreasePositions, maxIncreasePositions, maxDecreasePositions)",
       signer
     );
+
+    // let sender = await vault.gov();
+    // // await positionRouter.setPositionKeeper(secondaryPriceFeed.address, true);
+    //
+    // // await positionRouter.executeIncreasePositions(endIndexForIncreasePositions, sender, {
+    // //         gasPrice: "25000000000",
+    // //         gasLimit: "12626360",
+    // //       });
+    //
+    // console.log(await positionRouter.isPositionKeeper(secondaryPriceFeed.address));
+    // console.log(await positionRouter.isPositionKeeper(sender));
 
     await sleep(24000);
   }

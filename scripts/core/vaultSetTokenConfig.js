@@ -23,6 +23,15 @@ async function getAvaxValues() {
   return { vault, tokenArr }
 }
 
+async function getAvaxTestValues() {
+  const vault = await contractAt("Vault", "0xAC6E2Ac93E2a1CFFadE96607fe2376F5f5952EDC")
+
+  const { btc, eth, avax, link, usdt } = tokens
+  const tokenArr = [btc, eth, avax, link, usdt]
+
+  return { vault, tokenArr }
+}
+
 async function getValues() {
   if (network === "arbitrum") {
     return getArbValues()
@@ -30,6 +39,10 @@ async function getValues() {
 
   if (network === "avax") {
     return getAvaxValues()
+  }
+
+  if (network === "avaxtest") {
+    return getAvaxTestValues()
   }
 }
 
@@ -48,16 +61,27 @@ async function main() {
   console.log("vaultMethod", vaultMethod)
 
   for (const token of tokenArr) {
-    await sendTxn(vaultTimelock[vaultMethod](
-      vault.address,
-      token.address, // _token
-      token.decimals, // _tokenDecimals
-      token.tokenWeight, // _tokenWeight
-      token.minProfitBps, // _minProfitBps
-      expandDecimals(token.maxUsdgAmount, 18), // _maxUsdgAmount
-      token.isStable, // _isStable
-      token.isShortable // _isShortable
-    ), `vault.${vaultMethod}(${token.name}) ${token.address}`)
+    // await sendTxn(vaultTimelock[vaultMethod](
+    //   vault.address,
+    //   token.address, // _token
+    //   token.decimals, // _tokenDecimals
+    //   token.tokenWeight, // _tokenWeight
+    //   token.minProfitBps, // _minProfitBps
+    //   expandDecimals(token.maxUsdgAmount, 18), // _maxUsdgAmount
+    //   token.isStable, // _isStable
+    //   token.isShortable // _isShortable
+    // ), `vault.${vaultMethod}(${token.name}) ${token.address}`)
+    await sendTxn(
+      vault.setTokenConfig(
+        token.address, // _token
+        token.decimals, // _tokenDecimals
+        token.tokenWeight, // _tokenWeight
+        token.minProfitBps, // _minProfitBps
+        expandDecimals(token.maxUsdgAmount, 18), // _maxUsdgAmount
+        token.isStable, // _isStable
+        token.isShortable // _isShortable
+      ), "vault.setTokenConfig(${token.name}) ${token.address}"
+    );
   }
 }
 

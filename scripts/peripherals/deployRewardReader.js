@@ -5,21 +5,24 @@ const {
 } = require("../shared/helpers");
 
 async function main() {
-  //   await deployContract("RewardReader", [], "RewardReader")
 
+  // // first run
+  // await deployContract("RewardReader", [], "RewardReader")
+
+  // next run the following
   // getStakingInfo
-  const account = "0x083102dEc08D0a449bEd627bE204531bf34251Ae";
+  const account = "0x1FD2692bfA672bCf6Bf4634ed48D436F422d0E48";
   const rewardReader = await contractAt(
     "RewardReader",
-    "0x3767e236D07969bAc6eF8EbFA46EB5dD8b4F3E69"
+    "0x8F4e75dfc9387311Cc1e6b69C2919049b2a5D0C0"
   );
 
   const rewardTrackers = [
-    "0xfc05ab07893c88c2f19c94b664CC74884d4A6A33", // sGMX
-    "0x35194cA778B4a2360770025bb3c52826523B25FE", // sbGMX
-    "0x00E07C7055F1D370C1241495a9fC010B07F47497", // sbfGMX
-    "0xaF7BaE75c7D20CF53aE24bD6201ed3578C7e514b", // fsGLP
-    "0xb3de11a38D238acBDB22c99b99Ceb8895FCbc981", // fGLP
+    "0x897629A9F629C6629285AE864eB755be80dc200E", // sGMX
+    "0x2f9555566f4d007E20462Fe54e1E38b0129A27f6", // sbGMX
+    "0xCF0b26553158e212C81532C69383eE15F5463b66", // sbfGMX
+    "0x1dD38dee2fD5FEc859B0441Ef27e36C924085D0C", // fsGLP
+    "0xf41184904bE4F79D7bF047688F42eD774EC457E7", // fGLP
   ];
 
   const stakingInfos = await rewardReader.getStakingInfo(

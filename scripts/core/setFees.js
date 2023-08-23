@@ -34,6 +34,12 @@ async function main() {
       "0x7531626E87BdA9B8511bea536136e5349EDacE89"
     );
   }
+  if (network === "avaxtest") {
+    vault = await contractAt(
+      "Vault",
+      "0xAC6E2Ac93E2a1CFFadE96607fe2376F5f5952EDC"
+    );
+  }
 
   const timelock = await contractAt("Timelock", await vault.gov(), signer);
   console.log("timelock", timelock.address);
