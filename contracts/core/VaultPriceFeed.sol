@@ -7,6 +7,7 @@ import "../oracle/interfaces/IPriceFeed.sol";
 import "../oracle/interfaces/ISecondaryPriceFeed.sol";
 import "../oracle/interfaces/IChainlinkFlags.sol";
 import "../amm/interfaces/IPancakePair.sol";
+import "../oracle/interfaces/IAggregatorV3Interface.sol";
 
 pragma solidity 0.6.12;
 
@@ -276,9 +277,13 @@ contract VaultPriceFeed is IVaultPriceFeed {
         address priceFeedAddress = priceFeeds[_token];
         require(priceFeedAddress != address(0), "VaultPriceFeed: invalid price feed");
 
-        IPriceFeed priceFeed = IPriceFeed(priceFeedAddress);
+//        // Chainlink oracle
+//        IPriceFeed priceFeed = IPriceFeed(priceFeedAddress);
+//        int256 price = priceFeed.latestAnswer();
 
-        int256 price = priceFeed.latestAnswer();
+        // ODX zkEVM Testnet Chainlink compatible oracle
+        IAggregatorV3Interface priceFeed = IAggregatorV3Interface(priceFeedAddress);
+        (,int256 price, , , ) = priceFeed.latestRoundData();
         require(price > 0, "VaultPriceFeed: invalid price");
 
         return uint256(price);
