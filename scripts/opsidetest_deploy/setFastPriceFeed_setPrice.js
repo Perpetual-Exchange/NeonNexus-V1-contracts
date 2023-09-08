@@ -75,12 +75,42 @@ async function getAvaxTestValues() {
   return { vaultPriceFeed, positionRouter, tokenArr };
 }
 
+async function getOpTestValues() {
+  const { btc, eth } = tokens;
+  const tokenArr = [btc, eth];
+  const vaultPriceFeed = await contractAt(
+    "VaultPriceFeed",
+    "0x15E6E3E2b8107fddE8bb4E97982881e47890C57A"
+  );
+
+  const positionUtils = await contractAt(
+    "PositionUtils",
+    "0xE3aac6676E18f5229Cbd6cb3A6B809112C2B1932"
+  );
+
+  const positionRouter = await contractAt(
+    "PositionRouter",
+    "0x6A84F186A77F22B701Cb1CbA18da8b29E813A303",
+    null,
+    {
+      libraries: {
+        PositionUtils: positionUtils.address,
+      },
+    }
+  );
+
+  return { vaultPriceFeed, positionRouter, tokenArr };
+}
+
 async function getValues() {
   if (network === "sepolia") {
     return getSepoliaValues();
   }
   if (network === "avaxtest") {
     return getAvaxTestValues();
+  }
+  if (network === "opsidetest") {
+    return getOpTestValues();
   }
 }
 
@@ -96,7 +126,7 @@ async function main() {
 
   const vault = await contractAt(
     "Vault",
-    "0xAC6E2Ac93E2a1CFFadE96607fe2376F5f5952EDC"
+    "0x357fa1565B94D9F7C770D30c95a405F805d95fEA"
   );
   const timelock = await contractAt("Timelock", await vault.gov());
   //   const orderbook = await contractAt(
@@ -134,8 +164,17 @@ async function main() {
   console.log("secondaryPriceFeed:", secondaryPriceFeed.address);
   console.log("positionRouter:", positionRouter.address);
 
+  let timer = 0;
+  let interval = 5000;
+
   while (true) {
+    timer = timer + interval;
+
     const keysIndex = await positionRouter.getRequestQueueLengths();
+    let key0 = keysIndex[0];
+    let key1 = keysIndex[1];
+    let key2 = keysIndex[2];
+    let key3 = keysIndex[3];
     console.log("increasePositionRequestKeysStart:", keysIndex[0].toString());
     console.log("increasePositionRequestKeys.length:", keysIndex[1].toString());
     console.log("decreasePositionRequestKeysStart:", keysIndex[2].toString());
@@ -323,10 +362,15 @@ async function main() {
     const prices = [];
     for (let i in tokenArr) {
       const tokenItem = tokenArr[i];
-      const priceFeed = await contractAt("PriceFeed", tokenItem.priceFeed);
-      const price = await priceFeed.latestAnswer();
-      prices[i] = price.div(10 ** 5).toString();
-      console.log(tokenItem.name, "oracle.latest:",price.toString(), "dividedPrice:", prices[i]);
+      // ms
+      // const priceFeed = await contractAt("PriceFeed", tokenItem.priceFeed);
+      // const price = await priceFeed.latestAnswer();
+      // prices[i] = price.div(10 ** 5).toString();
+      // console.log(tokenItem.name, "oracle.latest:",price.toString(), "dividedPrice:", prices[i]);
+      const priceFeed = await ethers.getContractAt("IAggregatorV3Interface", tokenItem.priceFeed);
+      let rets = await priceFeed.latestRoundData();
+      prices[i] = rets[1].div(10 ** 5).toString();
+      console.log(tokenItem.name, "oracle.latest:",rets[1].toString(), "dividedPrice:", prices[i]);
 
       // prices2[i] = price.div(10 ** 2).toString();
     }
@@ -352,23 +396,28 @@ async function main() {
     console.log("priceBits:",priceBits,"blockTime:", blockTime, "endIndexForIncreasePositions:", endIndexForIncreasePositions, "endIndexForDecreasePositions:",
       endIndexForDecreasePositions, "maxIncreasePositions:", maxIncreasePositions, "maxDecreasePositions:", maxDecreasePositions);
 
-    await sendTxn(
-      secondaryPriceFeed.setPricesWithBitsAndExecute(
-        positionRouter.address,
-        priceBits,
-        blockTime,
-        endIndexForIncreasePositions,
-        endIndexForDecreasePositions,
-        maxIncreasePositions,
-        maxDecreasePositions,
-        {
-          gasPrice: "25000000000",
-          gasLimit: "12626360",
-        }
-      ),
-      "secondaryPriceFeed.setPricesWithBitsAndExecute(positionRouter, priceBits, timestamp, endIndexForIncreasePositions, endIndexForDecreasePositions, maxIncreasePositions, maxDecreasePositions)",
-      signer
-    );
+    if (key1 > key0 || key3 > key2 || timer >= 300000) {
+      timer = 0;
+
+      await sendTxn(
+        secondaryPriceFeed.setPricesWithBitsAndExecute(
+          positionRouter.address,
+          priceBits,
+          blockTime,
+          endIndexForIncreasePositions,
+          endIndexForDecreasePositions,
+          maxIncreasePositions,
+          maxDecreasePositions,
+          {
+            // gasPrice: "25000000000",
+            gasLimit: "12626360",
+          }
+        ),
+        "secondaryPriceFeed.setPricesWithBitsAndExecute(positionRouter, priceBits, timestamp, endIndexForIncreasePositions, endIndexForDecreasePositions, maxIncreasePositions, maxDecreasePositions)",
+        signer
+      );
+    }
+
 
     // let sender = await vault.gov();
     // // await positionRouter.setPositionKeeper(secondaryPriceFeed.address, true);
@@ -381,7 +430,7 @@ async function main() {
     // console.log(await positionRouter.isPositionKeeper(secondaryPriceFeed.address));
     // console.log(await positionRouter.isPositionKeeper(sender));
 
-    await sleep(300000);
+    await sleep(interval);
   }
 }
 
