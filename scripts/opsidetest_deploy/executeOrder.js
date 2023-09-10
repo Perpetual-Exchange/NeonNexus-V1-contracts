@@ -123,7 +123,7 @@ async function main() {
     let count = 0;
     for (let i=0;i<data.orders.length;i++) {
       let order = data.orders[i];
-      console.log("idx:", i, "id:", order.id);
+      console.log(new Date(), "total:", data.orders.length, "idx:", i, "id:", order.id);
       if (order.type === "increase") {
         try {
           await sendTxn(
