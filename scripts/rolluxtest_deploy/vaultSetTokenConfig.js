@@ -41,6 +41,14 @@ async function getOpTestValues() {
   return { vault, tokenArr }
 }
 
+async function getRoTestValues() {
+  const vault = await contractAt("Vault", "0xffe4E159fd0f96b01463b297a5bcA784000C50C9")
+  const { btc, eth, sys, dai, usdt } = tokens
+  const tokenArr = [btc, eth, sys, dai, usdt]
+
+  return { vault, tokenArr }
+}
+
 async function getValues() {
   if (network === "arbitrum") {
     return getArbValues()
@@ -57,6 +65,10 @@ async function getValues() {
   if (network === "opsidetest") {
     return getOpTestValues()
   }
+
+  if (network === "rolluxtest") {
+    return getRoTestValues()
+  }
 }
 
 async function main() {
@@ -68,22 +80,23 @@ async function main() {
   const vaultGov = await vault.gov()
 
   const vaultTimelock = await contractAt("Timelock", vaultGov, signer)
-  // const vaultMethod = "signalVaultSetTokenConfig"
-  // const vaultMethod = "vaultSetTokenConfig"
-  // const vaultMethod = "signalSetGov"
 
   console.log("signer.address:", await signer.address)
   console.log("vault:", await vault.address)
   console.log("vault.gov:", await vault.gov())
   console.log("vaultTimelock", await vaultTimelock.address)
-  console.log("vaultTimelock.buffer:", (await vaultTimelock.buffer()).toString())
+  // console.log("vaultTimelock.buffer:", (await vaultTimelock.buffer()).toString())
 
-    // // set vault gov
-    // await sendTxn(vaultTimelock[vaultMethod](
-    //   vault.address,
-    //   signer.address
-    // ), `vaultTimelock.${vaultMethod}`)
+  // const vaultMethod = "signalVaultSetTokenConfig"
+  // const vaultMethod = "vaultSetTokenConfig"
+  // const vaultMethod = "signalSetGov"
+  const vaultMethod = "setGov"
 
+  // set vault gov
+  // await sendTxn(vaultTimelock[vaultMethod](
+  //   vault.address,
+  //   signer.address
+  // ), `vaultTimelock.${vaultMethod}(${vault.address}, ${signer.address})`)
 
   for (const token of tokenArr) {
     // await sendTxn(vaultTimelock[vaultMethod](

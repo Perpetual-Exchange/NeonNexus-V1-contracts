@@ -13,11 +13,13 @@ const {
   SEPOLIA_URL,
   AVAX_TESTNET_URL,
   OPSIDE_TESTNET_URL,
+  ROLLUX_TESTNET_URL,
   ARBITRUM_DEPLOY_KEY,
   AVAX_DEPLOY_KEY,
   SEPOLIA_DEPLOY_KEY,
   AVAX_TESTNET_DEPLOY_KEY,
   OPSIDE_TESTNET_DEPLOY_KEY,
+  ROLLUX_TESTNET_DEPLOY_KEY,
 } = require("../../env.json");
 
 const providers = {
@@ -26,6 +28,7 @@ const providers = {
   sepolia: new ethers.providers.JsonRpcProvider(SEPOLIA_URL),
   avaxtest: new ethers.providers.JsonRpcProvider(AVAX_TESTNET_URL),
   opsidetest: new ethers.providers.JsonRpcProvider(OPSIDE_TESTNET_URL),
+  rolluxtest: new ethers.providers.JsonRpcProvider(ROLLUX_TESTNET_URL),
 };
 
 const signers = {
@@ -34,6 +37,7 @@ const signers = {
   sepolia: new ethers.Wallet(SEPOLIA_DEPLOY_KEY).connect(providers.sepolia),
   avaxtest: new ethers.Wallet(AVAX_TESTNET_DEPLOY_KEY).connect(providers.avaxtest),
   opsidetest: new ethers.Wallet(OPSIDE_TESTNET_DEPLOY_KEY).connect(providers.opsidetest),
+  rolluxtest: new ethers.Wallet(ROLLUX_TESTNET_DEPLOY_KEY).connect(providers.rolluxtest),
 };
 
 function sleep(ms) {
@@ -73,6 +77,10 @@ function getChainId(network) {
 
   if (network === "opsidetest") {
     return 12020;
+  }
+
+  if (network === "rolluxtest") {
+    return 57000;
   }
 
   throw new Error("Unsupported network");

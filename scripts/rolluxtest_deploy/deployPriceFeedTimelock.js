@@ -1,0 +1,147 @@
+const {
+  deployContract,
+  contractAt,
+  sendTxn,
+  getFrameSigner,
+} = require("../shared/helpers");
+const { expandDecimals } = require("../../test/shared/utilities");
+
+const network = process.env.HARDHAT_NETWORK || "mainnet";
+
+async function getArbValues() {
+  const tokenManager = {
+    address: "0xddDc546e07f1374A07b270b7d863371e575EA96A",
+  };
+
+  return { tokenManager };
+}
+
+async function getAvaxValues() {
+  const tokenManager = {
+    address: "0x8b25Ba1cAEAFaB8e9926fabCfB6123782e3B4BC2",
+  };
+
+  return { tokenManager };
+}
+
+async function getSepoliaValues() {
+  const tokenManager = {
+    address: "0x2E73eF81d7cD9305169c01BB576089948B9a0dA7",
+  };
+
+  return { tokenManager };
+}
+
+async function getAvaxTestValues() {
+  const tokenManager = {
+    address: "0x7199734D2CC6bC4eB45Ebe251539a4CEDde2d2D4",
+  };
+
+  return { tokenManager };
+}
+
+async function getOpTestValues() {
+  const tokenManager = {
+    address: "0xcE21E036Dca74bbEdC0A883e3D448b45aB5a663A",
+  };
+
+  return { tokenManager };
+}
+
+async function getRoTestValues() {
+  const tokenManager = {
+    address: "0x0c6C0779DF528CFf7e15528354eF4714c7B9dF3D",
+  };
+
+  return { tokenManager };
+}
+
+async function getValues() {
+  if (network === "arbitrum") {
+    return getArbValues();
+  }
+
+  if (network === "avax") {
+    return getAvaxValues();
+  }
+
+  if (network === "sepolia") {
+    return getSepoliaValues();
+  }
+
+  if (network === "avaxtest") {
+    return getAvaxTestValues();
+  }
+
+  if (network === "opsidetest") {
+    return getOpTestValues();
+  }
+
+  if (network === "rolluxtest") {
+    return getRoTestValues();
+  }
+
+}
+
+async function main() {
+  const signer = await getFrameSigner();
+
+  const admin = signer.address;
+  // const buffer = 24 * 60 * 60;
+  const buffer = 10;
+
+  const { tokenManager } = await getValues();
+
+  const deployedTimelock = await deployContract(
+    "PriceFeedTimelock",
+    [admin, buffer, tokenManager.address],
+    "Timelock"
+  );
+
+  // const deployedTimelock = await contractAt(
+  //   "PriceFeedTimelock",
+  //   timelock.address,
+  //   signer
+  // );
+
+  //   const signers = [
+  //     "0x82429089e7c86B7047b793A9E7E7311C93d2b7a6", // coinflipcanada
+  //     "0xD7941C4Ca57a511F21853Bbc7FBF8149d5eCb398", // G
+  //     "0xfb481D70f8d987c1AE3ADc90B7046e39eb6Ad64B", // kr
+  //     "0x99Aa3D1b3259039E8cB4f0B33d0Cfd736e1Bf49E", // quat
+  //     "0x6091646D0354b03DD1e9697D33A7341d8C93a6F5", // xhiroz
+  //   ];
+  const signers = [
+    signer.address, // deployer
+    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu
+    // "0xc7816AB57762479dCF33185bad7A1cFCb68a7997",
+    // "0x1Ce32739c33Eecb06dfaaCa0E42bd04E56CCbF0d",
+  ];
+
+  for (let i = 0; i < signers.length; i++) {
+    const signer = signers[i];
+    await sendTxn(
+      deployedTimelock.setContractHandler(signer, true),
+      `deployedTimelock.setContractHandler(${signer})`
+    );
+  }
+
+  const keepers = [
+    signer.address, // deployer
+  ];
+
+  for (let i = 0; i < keepers.length; i++) {
+    const keeper = keepers[i];
+    await sendTxn(
+      deployedTimelock.setKeeper(keeper, true),
+      `deployedTimelock.setKeeper(${keeper})`
+    );
+  }
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
