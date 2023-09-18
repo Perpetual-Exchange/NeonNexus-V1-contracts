@@ -1,4 +1,5 @@
 const {
+  signers,
   providers,
   getFrameSigner,
   deployContract,
@@ -20,9 +21,45 @@ const { VAULT_ADDR,
   SHORTSTRACKERTIMELOCK_ADDR,
   POSITIONUTILS_ADDR,
 } = require("../conf/contract.json");
+const {expandDecimals} = require("../../test/shared/utilities");
 
 const network = process.env.HARDHAT_NETWORK || "mainnet";
 const tokens = require("./tokens")[network];
+
+async function getInfoTokens(vault, reader, tokens, tokenArr) {
+  const vaultTokenInfo = await reader.getVaultTokenInfo(
+    vault.address,
+    tokens.nativeToken.address,
+    expandDecimals(1, 18),
+    tokenArr.map(t => t.address)
+  )
+  console.log("tokenArr.length", tokenArr.length)
+  console.log("vaultTokenInfo.length", vaultTokenInfo.length)
+  console.log("vaultTokenInfo", vaultTokenInfo)
+  const infoTokens = {}
+  const vaultPropsLength = 10
+
+  for (let i = 0; i < tokenArr.length; i++) {
+    const token = JSON.parse(JSON.stringify(tokenArr[i]))
+
+    console.log("vaultTokenInfo", i * vaultPropsLength)
+    token.poolAmount = vaultTokenInfo[i * vaultPropsLength]
+    token.reservedAmount = vaultTokenInfo[i * vaultPropsLength + 1]
+    token.usdgAmount = vaultTokenInfo[i * vaultPropsLength + 2]
+    token.redemptionAmount = vaultTokenInfo[i * vaultPropsLength + 3]
+    token.weight = vaultTokenInfo[i * vaultPropsLength + 4]
+    token.minPrice = vaultTokenInfo[i * vaultPropsLength + 5]
+    token.maxPrice = vaultTokenInfo[i * vaultPropsLength + 6]
+    token.guaranteedUsd = vaultTokenInfo[i * vaultPropsLength + 7]
+    token.maxPrimaryPrice = vaultTokenInfo[i * vaultPropsLength + 8]
+    token.minPrimaryPrice = vaultTokenInfo[i * vaultPropsLength + 9]
+    console.log("token", token)
+
+    infoTokens[token.address] = token
+  }
+
+  return infoTokens
+}
 
 async function getOpTestValues() {
   const provider = providers.opsidetest;
@@ -32,11 +69,15 @@ async function getOpTestValues() {
 
 async function getRoTestValues() {
 
+  const signer = signers.rolluxtest;
   const provider = providers.rolluxtest;
   const { btc, eth, sys, dai, usdt } = tokens;
   const tokenArr = [btc, eth, sys];
+  const tokenAllArr = [btc, eth, sys, dai, usdt];
+  const vault = await contractAt("Vault", "0xffe4E159fd0f96b01463b297a5bcA784000C50C9", signer)
+  const reader = await contractAt("Reader", "0xA6f0764aA7B401DE2e2DDb8B0fCc51EaaE679D70", signer)
 
-  return { provider, tokenArr }
+  return { signer, provider, vault, reader, tokenArr, tokenAllArr }
 }
 
 async function getValues() {
@@ -51,10 +92,15 @@ async function getValues() {
 
 async function main() {
 
-  const { provider, tokenArr } = await getValues();
-  const signer = await getFrameSigner();
+  const { signer, provider, vault, reader, tokenArr, tokenAllArr  } = await getValues();
+
   console.log("signer.address:", await signer.address);
   console.log("chainId:", await signer.getChainId());
+
+  console.log("\n--------------------vaultTokenInfo", provider.network);
+  const infoTokens = await getInfoTokens(vault, reader, tokens, tokenAllArr);
+  console.log("--------------------vaultTokenInfo\n");
+
 
   // console.log("\n--------------------oracle pricefeed", provider.network);
   // const prices = [];
@@ -67,19 +113,19 @@ async function main() {
   // }
   // console.log("--------------------oracle pricefeed\n");
 
-  console.log("\n--------------------account balance", provider.network);
-  let accountArr = [
-    { name: "priceUpdater", address: "0x5b796B035ad1C73565c93ea63d62aEDB9347F382"},
-    { name: "executor", address: "0xcd7716aAFC70A83EcD19B80C61a3149f08442Cb8"},
-    { name: "orderKeeper", address: "0x84073D58c53E8d90065a1ea570B4f6E6Ee63DA5d"},
-    { name: "liquidator", address: "0x6A6D608a0dE1742Be622Fee4f9189243c0d68153"}
-  ];
-  for (const account of accountArr) {
-    let balance = await provider.getBalance(account.address);
-    let etherBalance = ethers.utils.formatEther(balance);
-    console.log(`${account.name}(${account.address}).balance:`, etherBalance);
-  }
-  console.log("--------------------account balance\n");
+  // console.log("\n--------------------account balance", provider.network);
+  // let accountArr = [
+  //   { name: "priceUpdater", address: "0x5b796B035ad1C73565c93ea63d62aEDB9347F382"},
+  //   { name: "executor", address: "0xcd7716aAFC70A83EcD19B80C61a3149f08442Cb8"},
+  //   { name: "orderKeeper", address: "0x84073D58c53E8d90065a1ea570B4f6E6Ee63DA5d"},
+  //   { name: "liquidator", address: "0x6A6D608a0dE1742Be622Fee4f9189243c0d68153"}
+  // ];
+  // for (const account of accountArr) {
+  //   let balance = await provider.getBalance(account.address);
+  //   let etherBalance = ethers.utils.formatEther(balance);
+  //   console.log(`${account.name}(${account.address}).balance:`, etherBalance);
+  // }
+  // console.log("--------------------account balance\n");
 
   // const timelock = await contractAt("Timelock", "0xAfc3Cc911c900e1FB682aabe3f899b81BCCAD419", signer);
   // console.log("timelock.address:", await timelock.address);
