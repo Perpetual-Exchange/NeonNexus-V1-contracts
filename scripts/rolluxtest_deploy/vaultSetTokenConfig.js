@@ -41,15 +41,18 @@ async function getOpTestValues() {
   return { vault, tokenArr }
 }
 
-async function getRoTestValues() {
-  const vault = await contractAt("Vault", "0xffe4E159fd0f96b01463b297a5bcA784000C50C9")
-  const { btc, eth, sys, dai, usdt } = tokens
-  const tokenArr = [btc, eth, sys, dai, usdt]
+async function getRoTestValues(signer) {
 
-  return { vault, tokenArr }
+  const { btc, eth, sys, dai } = tokens
+  const tokenArr = [btc, eth, sys, dai]
+
+  const vault = await contractAt("Vault", "0xffe4E159fd0f96b01463b297a5bcA784000C50C9", signer)
+  const vaultTimelock = await contractAt("Timelock", "0xAfc3Cc911c900e1FB682aabe3f899b81BCCAD419", signer)
+
+  return { vault, vaultTimelock, tokenArr }
 }
 
-async function getValues() {
+async function getValues(signer) {
   if (network === "arbitrum") {
     return getArbValues()
   }
@@ -67,19 +70,17 @@ async function getValues() {
   }
 
   if (network === "rolluxtest") {
-    return getRoTestValues()
+    return getRoTestValues(signer)
   }
 }
 
 async function main() {
   const signer = await getFrameSigner()
 
-  const { vault, tokenArr } = await getValues()
+  const { vault, vaultTimelock, tokenArr } = await getValues(signer)
   const iVault = await ethers.getContractAt("IVault", vault.address);
 
   const vaultGov = await vault.gov()
-
-  const vaultTimelock = await contractAt("Timelock", vaultGov, signer)
 
   console.log("signer.address:", await signer.address)
   console.log("vault:", await vault.address)
@@ -92,11 +93,20 @@ async function main() {
   // const vaultMethod = "signalSetGov"
   const vaultMethod = "setGov"
 
-  // set vault gov
+  // set vault gov signer
   // await sendTxn(vaultTimelock[vaultMethod](
   //   vault.address,
   //   signer.address
   // ), `vaultTimelock.${vaultMethod}(${vault.address}, ${signer.address})`)
+
+  // // vault clear tokenConfig
+  // await sendTxn(vault.clearTokenConfig("0x9D973BAc12BB62A55be0F9f7Ad201eEA4f9B8428"),
+  //   `vault.clearTokenConfig(0x9D973BAc12BB62A55be0F9f7Ad201eEA4f9B8428)`)
+
+  // // vault set gov Timelock
+  // await sendTxn(vault.setGov(vaultTimelock.address),
+  //   `vault.setGov(${vaultTimelock.address})`)
+  // console.log("vaultTimelock.address:", await vaultTimelock.address)
 
   for (const token of tokenArr) {
     // await sendTxn(vaultTimelock[vaultMethod](
