@@ -218,7 +218,7 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
         require(usdgAmount >= _minUsdg, "RlpManager: insufficient USDG output");
 
         uint256 mintAmount = aumInUsdg == 0 ? usdgAmount : usdgAmount.mul(glpSupply).div(aumInUsdg);
-        require(mintAmount >= _minGlp, "RlpManager: insufficient GLP output");
+        require(mintAmount >= _minGlp, "RlpManager: insufficient RLP output");
 
         IMintable(glp).mint(_account, mintAmount);
 
@@ -230,7 +230,7 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
     }
 
     function _removeLiquidity(address _account, address _tokenOut, uint256 _glpAmount, uint256 _minOut, address _receiver) private returns (uint256) {
-        require(_glpAmount > 0, "RlpManager: invalid _glpAmount");
+        require(_glpAmount > 0, "RlpManager: invalid _rlpAmount");
         require(lastAddedAt[_account].add(cooldownDuration) <= block.timestamp, "RlpManager: cooldown duration not yet passed");
 
         // calculate aum before sellUSDG
