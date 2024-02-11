@@ -3,7 +3,7 @@ const { expandDecimals } = require("../../test/shared/utilities")
 
 async function main() {
   const addresses = {}
-  const account = { admin: "0xAcdC274B853e01e9666E03c662d30A83B8F73080",
+  const account = { admin: "0x95E9C006F3426cA86A6BdC678de14C922B814cF4",
                     tester: "0x1Ce32739c33Eecb06dfaaCa0E42bd04E56CCbF0d"}
 
   const btc = await deployContract("FaucetToken", ["Bitcoin", "RBTC", 18, expandDecimals(10000, 18)]);
