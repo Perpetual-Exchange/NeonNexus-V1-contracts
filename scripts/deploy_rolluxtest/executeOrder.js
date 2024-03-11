@@ -61,6 +61,7 @@ async function getOpTestValues() {
 async function getRoTestValues() {
   // const signer = await getFrameSigner();
   const signer = await new ethers.Wallet(ROLLUX_TESTNET_ORDERKEEPER_KEY).connect(providers.rolluxtest)
+  console.log("signer.address:", signer.address);
 
   const vault = await contractAt(
     "Vault",
@@ -138,59 +139,63 @@ async function main() {
   }`
 
   while (true) {
-    console.log("\n\n-------------------------", new Date());
-
     const data = await request('https://graph.neonnexus.io/subgraphs/name/nexus/nexus-rt-stats', document);
     console.log("orders.length:", data.orders.length);
 
     let count = 0;
     for (let i=0;i<data.orders.length;i++) {
       let order = data.orders[i];
-      console.log(new Date(), "total:", data.orders.length, "idx:", i, "id:", order.id);
+      console.log("\n\n-------------------------", new Date(), "total:", data.orders.length, "idx:", i, "id:", order.id);
+      console.log(order);
       if (order.type === "increase") {
         try {
-          await sendTxn(
-            positionManager.executeIncreaseOrder(order.account, Number(order.index), feeReceiver,{
-              gasLimit: "12626360",
-            }),
-            "positionManager.executeIncreaseOrder"
-          );
-          count ++;
+          // await sendTxn(
+          //   positionManager.executeIncreaseOrder(order.account, Number(order.index), feeReceiver,{
+          //     gasLimit: "12626360",
+          //   }),
+          //   "positionManager.executeIncreaseOrder"
+          // );
+          // count ++;
 
         } catch (e) {
           console.log("executeIncreaseOrder error:", e.toString());
         }
       } else if (order.type === "decrease") {
         try {
-          await sendTxn(
-            positionManager.executeDecreaseOrder(order.account, Number(order.index), feeReceiver,{
-              gasLimit: "12626360",
-            }),
-            "positionManager.executeDecreaseOrder"
-          );
-          count ++;
+          // await sendTxn(
+          //   positionManager.executeDecreaseOrder(order.account, Number(order.index), feeReceiver,{
+          //     gasLimit: "12626360",
+          //   }),
+          //   "positionManager.executeDecreaseOrder"
+          // );
+          // count ++;
 
         } catch (e) {
           console.log("executeDecreaseOrder error:", e.toString());
         }
       } else if (order.type === "swap") {
-        try {
-          await sendTxn(
-            positionManager.executeSwapOrder(order.account, Number(order.index), feeReceiver,{
-              gasLimit: "12626360",
-            }),
-            "positionManager.executeSwapOrder"
-          );
-          count ++;
-
-        } catch (e) {
-          console.log("executeSwapOrder error:", e.toString());
+        let swapOrder = await orderBook.getSwapOrder(order.account, order.index);
+        let path = [ swapOrder.path0, swapOrder.path1 ];
+        let isExecuted = await orderBook.validateSwapOrderPriceWithTriggerAboveThreshold(path, swapOrder.triggerRatio);
+        if (isExecuted) {
+          console.log("swapOrder:", swapOrder);
+          try {
+            await sendTxn(
+              positionManager.executeSwapOrder(order.account, Number(order.index), feeReceiver, {
+                gasLimit: "12626360",
+              }),
+              "positionManager.executeSwapOrder"
+            );
+            count++;
+          } catch (e) {
+            console.log("executeSwapOrder error id:", order.id);
+          }
         }
       }
     }
     console.log("-------------------------", "orders total:", data.orders.length, "executed:", count);
 
-    await sleep(10000);
+    await sleep(100000);
   }
 
 
