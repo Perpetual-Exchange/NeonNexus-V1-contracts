@@ -138,12 +138,12 @@ async function main() {
     }
   }`
 
+  let count = 0;
   var failedOrders = new Map();
   while (true) {
     const data = await request('https://graph.neonnexus.io/subgraphs/name/nexus/nexus-rt-stats', document);
     console.log("orders.length:", data.orders.length);
 
-    let count = 0;
     for (let i=0;i<data.orders.length;i++) {
       let order = data.orders[i];
       console.log("\n\n-------------------------", new Date(), "total:", data.orders.length, "idx:", i, "id:", order.id);
