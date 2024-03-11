@@ -138,6 +138,7 @@ async function main() {
     }
   }`
 
+  var failedOrders = new Map();
   while (true) {
     const data = await request('https://graph.neonnexus.io/subgraphs/name/nexus/nexus-rt-stats', document);
     console.log("orders.length:", data.orders.length);
@@ -146,39 +147,70 @@ async function main() {
     for (let i=0;i<data.orders.length;i++) {
       let order = data.orders[i];
       console.log("\n\n-------------------------", new Date(), "total:", data.orders.length, "idx:", i, "id:", order.id);
+      if (failedOrders.has(order.id)) {
+        console.log("failed order id:", order.id);
+        continue;
+      }
+
       console.log(order);
       if (order.type === "increase") {
+        let increaseOrder = await orderBook.getIncreaseOrder(order.account, order.index);
         try {
-          // await sendTxn(
-          //   positionManager.executeIncreaseOrder(order.account, Number(order.index), feeReceiver,{
-          //     gasLimit: "12626360",
-          //   }),
-          //   "positionManager.executeIncreaseOrder"
-          // );
-          // count ++;
+          let ret = await orderBook.validatePositionOrderPrice(increaseOrder.triggerAboveThreshold,
+            increaseOrder.triggerPrice,
+            increaseOrder.indexToken,
+            increaseOrder.isLong,
+            true);
 
+          console.log("execute IncreaseOrder:", increaseOrder);
+          try {
+            await sendTxn(
+              positionManager.executeIncreaseOrder(order.account, Number(order.index), feeReceiver,{
+                gasLimit: "12626360",
+              }),
+              "positionManager.executeIncreaseOrder"
+            );
+            count ++;
+          } catch (e) {
+            console.log("executeIncreaseOrder error id:", order.id);
+            failedOrders.set(order.id, true);
+          }
         } catch (e) {
-          console.log("executeIncreaseOrder error:", e.toString());
+          console.log("executeIncreaseOrder not match id:", order.id);
         }
+
       } else if (order.type === "decrease") {
+        let decreaseOrder = await orderBook.getDecreaseOrder(order.account, order.index);
         try {
-          // await sendTxn(
-          //   positionManager.executeDecreaseOrder(order.account, Number(order.index), feeReceiver,{
-          //     gasLimit: "12626360",
-          //   }),
-          //   "positionManager.executeDecreaseOrder"
-          // );
-          // count ++;
+          let ret = await orderBook.validatePositionOrderPrice(decreaseOrder.triggerAboveThreshold,
+            decreaseOrder.triggerPrice,
+            decreaseOrder.indexToken,
+            !decreaseOrder.isLong,
+            true);
 
+          console.log("execute decreaseOrder:", decreaseOrder);
+          try {
+            await sendTxn(
+              positionManager.executeDecreaseOrder(order.account, Number(order.index), feeReceiver,{
+                gasLimit: "12626360",
+              }),
+              "positionManager.executeDecreaseOrder"
+            );
+            count ++;
+          } catch (e) {
+            console.log("executeDecreaseOrder error id:", order.id);
+            failedOrders.set(order.id, true);
+          }
         } catch (e) {
-          console.log("executeDecreaseOrder error:", e.toString());
+          console.log("executeDecreaseOrder not match id:", order.id);
         }
+
       } else if (order.type === "swap") {
         let swapOrder = await orderBook.getSwapOrder(order.account, order.index);
         let path = [ swapOrder.path0, swapOrder.path1 ];
         let isExecuted = await orderBook.validateSwapOrderPriceWithTriggerAboveThreshold(path, swapOrder.triggerRatio);
         if (isExecuted) {
-          console.log("swapOrder:", swapOrder);
+          console.log("execute swapOrder:", swapOrder);
           try {
             await sendTxn(
               positionManager.executeSwapOrder(order.account, Number(order.index), feeReceiver, {
@@ -189,13 +221,14 @@ async function main() {
             count++;
           } catch (e) {
             console.log("executeSwapOrder error id:", order.id);
+            failedOrders.set(order.id, true);
           }
         }
       }
     }
     console.log("-------------------------", "orders total:", data.orders.length, "executed:", count);
 
-    await sleep(100000);
+    await sleep(10000);
   }
 
 
