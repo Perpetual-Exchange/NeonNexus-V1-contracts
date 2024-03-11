@@ -138,7 +138,8 @@ async function main() {
     }
   }`
 
-  let count = 0;
+  const retryCount = 3;
+  let exeCount = 0;
   var failedOrders = new Map();
   while (true) {
     const data = await request('https://graph.neonnexus.io/subgraphs/name/nexus/nexus-rt-stats', document);
@@ -147,9 +148,13 @@ async function main() {
     for (let i=0;i<data.orders.length;i++) {
       let order = data.orders[i];
       console.log("\n\n-------------------------", new Date(), "total:", data.orders.length, "idx:", i, "id:", order.id);
+      let failedCount = 0;
       if (failedOrders.has(order.id)) {
-        console.log("failed order id:", order.id);
-        continue;
+        failedCount = failedOrders.get(order.id);
+        if (failedCount >= retryCount) {
+          console.log("failed order id:", order.id);
+          continue;
+        }
       }
 
       console.log(order);
@@ -170,10 +175,11 @@ async function main() {
               }),
               "positionManager.executeIncreaseOrder"
             );
-            count ++;
+            exeCount ++;
           } catch (e) {
             console.log("executeIncreaseOrder error id:", order.id);
-            failedOrders.set(order.id, true);
+            console.log(e.toString());
+            failedOrders.set(order.id, ++failedCount);
           }
         } catch (e) {
           console.log("executeIncreaseOrder not match id:", order.id);
@@ -196,10 +202,11 @@ async function main() {
               }),
               "positionManager.executeDecreaseOrder"
             );
-            count ++;
+            exeCount ++;
           } catch (e) {
             console.log("executeDecreaseOrder error id:", order.id);
-            failedOrders.set(order.id, true);
+            console.log(e.toString());
+            failedOrders.set(order.id, ++failedCount);
           }
         } catch (e) {
           console.log("executeDecreaseOrder not match id:", order.id);
@@ -218,15 +225,16 @@ async function main() {
               }),
               "positionManager.executeSwapOrder"
             );
-            count++;
+            exeCount ++;
           } catch (e) {
             console.log("executeSwapOrder error id:", order.id);
-            failedOrders.set(order.id, true);
+            console.log(e.toString());
+            failedOrders.set(order.id, ++failedCount);
           }
         }
       }
     }
-    console.log("-------------------------", "orders total:", data.orders.length, "executed:", count);
+    console.log("-------------------------", "orders total:", data.orders.length, "executed:", exeCount);
 
     await sleep(10000);
   }
