@@ -51,6 +51,8 @@ async function main() {
 
   console.log("glpManager.address:", await glpManager.address);
   console.log("glpManager.getAums():", await glpManager.getAums());
+  console.log("glpManager.cooldownDuration():", await glpManager.cooldownDuration());
+  console.log("glpManager.lastAddedAt(0x626aba32e69Df9a2d4A4Db1ad7E9C74c513326Ca):", await glpManager.lastAddedAt("0x626aba32e69Df9a2d4A4Db1ad7E9C74c513326Ca"));
 
 }
 

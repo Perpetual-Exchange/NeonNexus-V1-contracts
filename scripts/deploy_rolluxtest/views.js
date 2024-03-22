@@ -102,30 +102,36 @@ async function main() {
       "hex": "0x0de0b6b3a7640000"
     },
     [
-      "0x0000000000000000000000000000000000000000",
-      "0x5eD4813824E5e2bAF9BBC211121b21aB38E02522",
-      "0xfA600253bB6fE44CEAb0538000a8448807e50c85",
-      "0x9D973BAc12BB62A55be0F9f7Ad201eEA4f9B8428",
-      "0xf111Aa386823C4CF33F349597f1E772973Ac0913"
+      "0xcAc0759160d57A33D332Ed36a555C10957694407"
     ]
   );
+
+  // "0x0000000000000000000000000000000000000000",
+  //   "0x5eD4813824E5e2bAF9BBC211121b21aB38E02522",
+  //   "0xfA600253bB6fE44CEAb0538000a8448807e50c85",
+  //   "0x9D973BAc12BB62A55be0F9f7Ad201eEA4f9B8428",
+  //   "0xf111Aa386823C4CF33F349597f1E772973Ac0913",
   const propsLength = 15;
   for (let i = 0; i < VaultTokenInfoV4.length; i++) {
     let j = i % propsLength;
-    if (j === 5) {
-      console.log("bufferAmount:", VaultTokenInfoV4[i]);
+    // if (j === 5) {
+    //   console.log("bufferAmount:", VaultTokenInfoV4[i]);
+    // }
+    if (j === 0) {
+      console.log("\n%s:", i / propsLength);
     }
+    console.log("bufferAmount:", VaultTokenInfoV4[i]);
   }
   console.log("--------------------getVaultTokenInfoV4\n");
 
-  console.log("balance:", await reader.getTokenBalances("0xAcdC274B853e01e9666E03c662d30A83B8F73080", [
-    "0x0000000000000000000000000000000000000000",
-    "0x5eD4813824E5e2bAF9BBC211121b21aB38E02522",
-    "0xfA600253bB6fE44CEAb0538000a8448807e50c85",
-    "0x9D973BAc12BB62A55be0F9f7Ad201eEA4f9B8428",
-    "0xf111Aa386823C4CF33F349597f1E772973Ac0913"
-  ]));
-  console.log("--------------------getTokenBalances\n");
+  // console.log("balance:", await reader.getTokenBalances("0xAcdC274B853e01e9666E03c662d30A83B8F73080", [
+  //   "0x0000000000000000000000000000000000000000",
+  //   "0x5eD4813824E5e2bAF9BBC211121b21aB38E02522",
+  //   "0xfA600253bB6fE44CEAb0538000a8448807e50c85",
+  //   "0x9D973BAc12BB62A55be0F9f7Ad201eEA4f9B8428",
+  //   "0xf111Aa386823C4CF33F349597f1E772973Ac0913"
+  // ]));
+  // console.log("--------------------getTokenBalances\n");
 
   // const btc = "0xfA600253bB6fE44CEAb0538000a8448807e50c85";
   // const eth = "0x5eD4813824E5e2bAF9BBC211121b21aB38E02522";
