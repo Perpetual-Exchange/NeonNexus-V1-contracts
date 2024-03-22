@@ -161,7 +161,7 @@ async function main() {
   while (true) {
     console.log("\n-------------------------", new Date());
 
-    const data = await request('https://rollux.graph.rpc.tanenbaum.io/subgraphs/name/rollex/rollex-rt-stats', document);
+    const data = await request('https://graph.neonnexus.io/subgraphs/name/nexus/nexus-rt-stats', document);
     console.log("data.length:", data.activePositions.length);
 
     let positions = {aaa: ["a","b","c", true]};
