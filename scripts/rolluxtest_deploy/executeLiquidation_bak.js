@@ -76,7 +76,6 @@ async function getOpTestValues() {
 async function getRoTestValues() {
   // const signer = await getFrameSigner();
   const signer = await new ethers.Wallet(ROLLUX_TESTNET_LIQUIDATOR_KEY).connect(providers.rolluxtest)
-  console.log("signer.address:", signer.address);
 
   const vault = await contractAt(
     "Vault",
@@ -147,51 +146,47 @@ async function main() {
   //   positionManager.setLiquidator(liquidator, true),
   //   "positionManager.setLiquidator");
 
-  const interval = 60000;
+  const interval = 1800000;
   const document = gql`
     {
-      activePositions(where: {isActive: true}) {
-        id
-        account
-        indexToken
-        collateralToken
-        isLong
-        isActive
-      }
+        activePositions {
+          id
+        }
+        actions (where:{action_in:["IncreasePosition-Long", "IncreasePosition-Short"]}){
+          from
+          params
+        }
     }`
 
   while (true) {
     console.log("\n-------------------------", new Date());
 
-    const data = await request('https://graph.neonnexus.io/subgraphs/name/nexus/nexus-rt-raw', document);
+    const data = await request('https://graph.neonnexus.io/subgraphs/name/nexus/nexus-rt-stats', document);
     console.log("data.length:", data.activePositions.length);
 
-    // let positions = {aaa: ["a","b","c", true]};
-    // console.log("data.actions.length:", data.actions.length);
-    // for (let j=0;j<data.actions.length;j++) {
-    //   let action = data.actions[j];
-    //   console.log("index:", j, "account:", action.from);
-    //   let obj = JSON.parse(action.params);
-    //   console.log("index:", j, "collateralToken:", obj.collateralToken);
-    //
-    //   if (obj.key in positions) {
-    //   } else {
-    //     positions[obj.key] = [action.from, obj.collateralToken, obj.indexToken, obj.isLong]
-    //   }
-    // }
+    let positions = {aaa: ["a","b","c", true]};
+    console.log("data.actions.length:", data.actions.length);
+    for (let j=0;j<data.actions.length;j++) {
+      let action = data.actions[j];
+      console.log("index:", j, "account:", action.from);
+      let obj = JSON.parse(action.params);
+      console.log("index:", j, "collateralToken:", obj.collateralToken);
+
+      if (obj.key in positions) {
+      } else {
+        positions[obj.key] = [action.from, obj.collateralToken, obj.indexToken, obj.isLong]
+      }
+    }
 
     let count = 0;
     for (let i=0;i<data.activePositions.length;i++) {
       let activePosition = data.activePositions[i];
-      console.log("index:", i, "account:", activePosition.account, "key:", activePosition.id);
-      // console.log("account:", activePosition.account);
-      // console.log("indexToken:", activePosition.indexToken);
-      // console.log("collateralToken:", activePosition.collateralToken);
-      // console.log("isLong:", activePosition.isLong);
-
+      console.log("index:", i, "key:", activePosition.id);
+      if (activePosition.id in positions) {
+        let position = positions[activePosition.id];
         try {
           await sendTxn(
-            positionManager.liquidatePosition(activePosition.account, activePosition.collateralToken, activePosition.indexToken, activePosition.isLong, feeReceiver,{
+            positionManager.liquidatePosition(position[0], position[1], position[2], position[3], feeReceiver,{
                 gasLimit: "12626360",
               }),
             "positionManager.liquidatePosition"
@@ -201,22 +196,7 @@ async function main() {
         } catch (e) {
           console.log("liquidatePosition error:", e.toString());
         }
-
-      // if (activePosition.id in positions) {
-      //   let position = positions[activePosition.id];
-      //   try {
-      //     await sendTxn(
-      //       positionManager.liquidatePosition(position[0], position[1], position[2], position[3], feeReceiver,{
-      //           gasLimit: "12626360",
-      //         }),
-      //       "positionManager.liquidatePosition"
-      //     );
-      //     count ++;
-      //
-      //   } catch (e) {
-      //     console.log("liquidatePosition error:", e.toString());
-      //   }
-      // }
+      }
     }
 
     console.log("------------------------- activePositions:", data.activePositions.length, "executed:", count);
