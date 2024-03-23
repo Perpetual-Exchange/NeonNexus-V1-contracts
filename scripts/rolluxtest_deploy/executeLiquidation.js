@@ -190,14 +190,16 @@ async function main() {
       // console.log("isLong:", activePosition.isLong);
 
         try {
-          await sendTxn(
-            positionManager.liquidatePosition(activePosition.account, activePosition.collateralToken, activePosition.indexToken, activePosition.isLong, feeReceiver,{
-                gasLimit: "12626360",
-              }),
-            "positionManager.liquidatePosition"
-          );
-          count ++;
-
+          const ret = await vault.validateLiquidation(activePosition.account, activePosition.collateralToken, activePosition.indexToken, activePosition.isLong, false);
+          if (ret[0] > 0) {
+            await sendTxn(
+              positionManager.liquidatePosition(activePosition.account, activePosition.collateralToken, activePosition.indexToken, activePosition.isLong, feeReceiver,{
+                  gasLimit: "12626360",
+                }),
+              "positionManager.liquidatePosition"
+            );
+            count ++;
+          }
         } catch (e) {
           console.log("liquidatePosition error:", e.toString());
         }
