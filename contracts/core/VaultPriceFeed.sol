@@ -7,6 +7,7 @@ import "../oracle/interfaces/IPriceFeed.sol";
 import "../oracle/interfaces/ISecondaryPriceFeed.sol";
 import "../oracle/interfaces/IChainlinkFlags.sol";
 import "../amm/interfaces/IPancakePair.sol";
+import "../oracle/interfaces/IAggregatorV3Interface.sol";
 
 pragma solidity 0.6.12;
 
@@ -276,13 +277,69 @@ contract VaultPriceFeed is IVaultPriceFeed {
         address priceFeedAddress = priceFeeds[_token];
         require(priceFeedAddress != address(0), "VaultPriceFeed: invalid price feed");
 
-        IPriceFeed priceFeed = IPriceFeed(priceFeedAddress);
+//        // ODX zkEVM Testnet Chainlink compatible oracle
+//        IAggregatorV3Interface priceFeed = IAggregatorV3Interface(priceFeedAddress);
+//        (,int256 price, , , ) = priceFeed.latestRoundData();
 
+        // Chainlink oracle
+        IPriceFeed priceFeed = IPriceFeed(priceFeedAddress);
         int256 price = priceFeed.latestAnswer();
         require(price > 0, "VaultPriceFeed: invalid price");
 
         return uint256(price);
     }
+
+//    function getPrimaryPrice(address _token, bool _maximise) public override view returns (uint256) {
+//        address priceFeedAddress = priceFeeds[_token];
+//        require(priceFeedAddress != address(0), "VaultPriceFeed: invalid price feed");
+//
+//        if (chainlinkFlags != address(0)) {
+//            bool isRaised = IChainlinkFlags(chainlinkFlags).getFlag(FLAG_ARBITRUM_SEQ_OFFLINE);
+//            if (isRaised) {
+//                // If flag is raised we shouldn't perform any critical operations
+//                revert("Chainlink feeds are not being updated");
+//            }
+//        }
+//
+//        IAggregatorV3Interface priceFeed = IAggregatorV3Interface(priceFeedAddress);
+//
+//        uint256 price = 0;
+//        (uint80 roundId,,,,) = priceFeed.latestRoundData();
+//
+//        for (uint80 i = 0; i < priceSampleSpace; i++) {
+//            if (roundId <= i) { break; }
+//            uint256 p;
+//
+//            if (i == 0) {
+//                (, int256 _p, , ,) = priceFeed.latestRoundData();
+//                require(_p > 0, "VaultPriceFeed: invalid price");
+//                p = uint256(_p);
+//            } else {
+//                (, int256 _p, , ,) = priceFeed.getRoundData(roundId - i);
+//                require(_p > 0, "VaultPriceFeed: invalid price");
+//                p = uint256(_p);
+//            }
+//
+//            if (price == 0) {
+//                price = p;
+//                continue;
+//            }
+//
+//            if (_maximise && p > price) {
+//                price = p;
+//                continue;
+//            }
+//
+//            if (!_maximise && p < price) {
+//                price = p;
+//            }
+//        }
+//
+//        require(price > 0, "VaultPriceFeed: could not fetch price");
+//        // normalise price precision
+//        uint256 _priceDecimals = priceDecimals[_token];
+//        return price.mul(PRICE_PRECISION).div(10 ** _priceDecimals);
+//    }
 
     function getPrimaryPrice(address _token, bool _maximise) public override view returns (uint256) {
         address priceFeedAddress = priceFeeds[_token];

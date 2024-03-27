@@ -4,11 +4,11 @@ pragma solidity 0.6.12;
 
 import "../tokens/MintableBaseToken.sol";
 
-contract GMX is MintableBaseToken {
-    constructor() public MintableBaseToken("REX", "REX", 0) {
+contract OLP is MintableBaseToken {
+    constructor() public MintableBaseToken("ODX LP", "OLP", 0) {
     }
 
     function id() external pure returns (string memory _name) {
-        return "REX";
+        return "OLP";
     }
 }

@@ -15,21 +15,21 @@ async function main() {
 
   const glpManager = await contractAt(
     "GlpManager",
-    "0x241F2d418f23d42f821cdf516F2E530cE2a57f01"
+    "0x459aF0e66F49302DaE40Ba548FbBb16E3263C71F"
   );
 
   const glp = await contractAt(
     "GLP",
-    "0x5339340f11789E38F2b4a00C7f29D9c112B3333F"
+    "0x0F02098Bb29FAc827f2DA6b330dB9B423Bd07B84"
   );
 
   const gmx = await contractAt(
     "GMX",
-    "0x0C038276cd0089e58C2fc5d7CB6e7565Ca14650a"
+    "0x2CbF0056E15f4Fe2e04691D280D89bA645D6D364"
   );
   const esGmx = await contractAt(
     "EsGMX",
-    "0xf7B8fFCFd556c2BBbb36535e97d24610a9fE79E1"
+    "0x51DdD94dd1A6DFbb115c4272b44E1dFDb8AaAe2B"
   );
   const bnGmx = await deployContract("MintableBaseToken", [
     "Bonus GMX",

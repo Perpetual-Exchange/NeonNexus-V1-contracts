@@ -19,6 +19,8 @@ const {
   AVAX_CAP_KEEPER_KEY,
   SEPOLIA_URL,
   SEPOLIA_DEPLOY_KEY,
+  AVAX_TESTNET_URL,
+  AVAX_TESTNET_DEPLOY_KEY,
 } = require("../../env.json");
 
 async function getArbValues(signer) {
@@ -154,6 +156,50 @@ async function getSepoliaValues(signer) {
   };
 }
 
+async function getAvaxTestValues(signer) {
+  const provider = new ethers.providers.JsonRpcProvider(AVAX_TESTNET_URL);
+  const capKeeperWallet = new ethers.Wallet(AVAX_TESTNET_DEPLOY_KEY).connect(
+    provider
+  );
+
+  const vault = await contractAt(
+    "Vault",
+    "0xAC6E2Ac93E2a1CFFadE96607fe2376F5f5952EDC"
+  );
+  const timelock = await contractAt("Timelock", await vault.gov(), signer);
+  const router = await contractAt("Router", await vault.router(), signer);
+  const weth = await contractAt("WETH", tokens.nativeToken.address);
+  const referralStorage = await contractAt(
+    "ReferralStorage",
+    "0x62a48203B39573CC0dc989fDca6d28D5EE9C1Cc2"
+  );
+  const shortsTracker = await contractAt(
+    "ShortsTracker",
+    "0xD82bcA04b31eC58C5C2C62f798aC973A95c278d2",
+    signer
+  );
+  const shortsTrackerTimelock = await contractAt(
+    "ShortsTrackerTimelock",
+    "0xA5EF02B1406969DEc5744E1397217Db967f29C18",
+    signer
+  );
+  const depositFee = "30"; // 0.3%
+  const minExecutionFee = "20000000000000000"; // 0.02 AVAX
+
+  return {
+    capKeeperWallet,
+    vault,
+    timelock,
+    router,
+    weth,
+    referralStorage,
+    shortsTracker,
+    shortsTrackerTimelock,
+    depositFee,
+    minExecutionFee,
+  };
+}
+
 async function getValues(signer) {
   if (network === "arbitrum") {
     return getArbValues(signer);
@@ -165,6 +211,10 @@ async function getValues(signer) {
 
   if (network === "sepolia") {
     return getSepoliaValues(signer);
+  }
+
+  if (network === "avaxtest") {
+    return getAvaxTestValues(signer);
   }
 }
 
@@ -184,7 +234,12 @@ async function main() {
     referralStorage,
   } = await getValues(signer);
 
-  const positionUtils = await deployContract("PositionUtils", []);
+  // ms const positionUtils = await deployContract("PositionUtils", []);
+  const positionUtils = await contractAt(
+    "PositionUtils",
+    "0x04Eb210750C9696A040333a7FaeeE791c945249E",
+    signer
+  );
 
   const referralStorageGov = await contractAt(
     "Timelock",

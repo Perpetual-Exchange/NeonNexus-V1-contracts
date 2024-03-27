@@ -34,6 +34,14 @@ async function getSepoliaValues() {
   };
 }
 
+async function getAvaxTestValues() {
+  return {
+    handlers: [
+      "0xAcdC274B853e01e9666E03c662d30A83B8F73080", // Shorts Tracker Keeper
+    ],
+  };
+}
+
 async function getValues() {
   if (network === "localhost") {
     return await getLocalhostValues();
@@ -51,13 +59,17 @@ async function getValues() {
     return await getSepoliaValues();
   }
 
+  if (network === "avaxtest") {
+    return await getAvaxTestValues();
+  }
+
   throw new Error("No values for network " + network);
 }
 
 async function main() {
   const signer = await getFrameSigner();
 
-  const admin = "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471";
+  const admin = "0xAcdC274B853e01e9666E03c662d30A83B8F73080";
   const { handlers } = await getValues();
 
   const buffer = 60; // 60 seconds

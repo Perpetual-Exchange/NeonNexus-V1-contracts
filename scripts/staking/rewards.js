@@ -82,6 +82,32 @@ async function getSepoliaValues(signer) {
   return { rewardToken, tokenDecimals, rewardTrackerArr };
 }
 
+async function getAvaxTestValues(signer) {
+  const rewardToken = await contractAt(
+    "Token",
+    "0x2E11Aad6Ffa2E7f4F3b75187BFDa0A3633b3711d",
+    signer
+  );
+  const tokenDecimals = 18;
+
+  const rewardTrackerArr = [
+    {
+      name: "feeGmxTracker",
+      address: "0xCF0b26553158e212C81532C69383eE15F5463b66",
+      //   transferAmount: expandDecimals("2479", 18),
+      transferAmount: expandDecimals(2, 17),
+    },
+    {
+      name: "feeGlpTracker",
+      address: "0xf41184904bE4F79D7bF047688F42eD774EC457E7",
+      // transferAmount: expandDecimals("9606", 18),
+      transferAmount: expandDecimals(2, 17),
+    },
+  ];
+
+  return { rewardToken, tokenDecimals, rewardTrackerArr };
+}
+
 async function updateRewards({ signer, values, intervalUpdater }) {
   const { rewardToken, tokenDecimals, rewardTrackerArr } = values;
 
@@ -130,5 +156,6 @@ module.exports = {
   getArbValues,
   getAvaxValues,
   getSepoliaValues,
+  getAvaxTestValues,
   updateRewards,
 };

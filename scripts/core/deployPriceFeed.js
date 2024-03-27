@@ -19,6 +19,8 @@ const {
   AVAX_CAP_KEEPER_KEY,
   SEPOLIA_URL,
   SEPOLIA_DEPLOY_KEY,
+  AVAX_TESTNET_URL,
+  AVAX_TESTNET_DEPLOY_KEY,
 } = require("../../env.json");
 
 async function getArbValues(signer) {
@@ -233,6 +235,85 @@ async function getSepoliaValues(signer) {
   };
 }
 
+async function getAvaxTestValues(signer) {
+  const provider = new ethers.providers.JsonRpcProvider(AVAX_TESTNET_URL);
+  const capKeeperWallet = new ethers.Wallet(AVAX_TESTNET_DEPLOY_KEY).connect(
+    provider
+  );
+
+  const { btc, eth, avax, link, usdt } = tokens;
+  const tokenArr = [btc, eth, avax, link, usdt];
+  const fastPriceTokens = [btc, eth, avax, link];
+
+  const priceFeedTimelock = {
+    address: "0x39A31D579a53F75d872Ce7d5CB3E3ad41CFBdCA8",
+  };
+
+  const updater1 = { address: "0xAcdC274B853e01e9666E03c662d30A83B8F73080" };
+  const updater2 = { address: "0x1FD2692bfA672bCf6Bf4634ed48D436F422d0E48" };
+  const keeper1 = { address: "0xAcdC274B853e01e9666E03c662d30A83B8F73080" };
+  const keeper2 = { address: "0x1FD2692bfA672bCf6Bf4634ed48D436F422d0E48" };
+  const updaters = [
+    updater1.address,
+    updater2.address,
+    keeper1.address,
+    keeper2.address,
+  ];
+
+  const tokenManager = {
+    address: "0x7199734D2CC6bC4eB45Ebe251539a4CEDde2d2D4",
+  };
+
+  const positionUtils = await contractAt(
+    "PositionUtils",
+    "0x04Eb210750C9696A040333a7FaeeE791c945249E"
+  );
+
+  const positionRouter1 = await contractAt(
+    "PositionRouter",
+    "0x3cFF0ef03dF66b198E99AF2bF0d04bc537F06C00",
+    capKeeperWallet,
+    {
+      libraries: {
+        PositionUtils: positionUtils.address,
+      },
+    }
+  );
+  const positionRouter2 = await contractAt(
+    "PositionRouter",
+    "0x3cFF0ef03dF66b198E99AF2bF0d04bc537F06C00",
+    capKeeperWallet,
+    {
+      libraries: {
+        PositionUtils: positionUtils.address,
+      },
+    }
+  );
+
+  // ms const router = await contractAt(
+  //   "Router",
+  //   "0xf6447de9988F36C0E74fb3991E1d001DB7A1bec8"
+  // );
+
+  // const fastPriceEvents = await deployContract("FastPriceEvents", []);
+    const fastPriceEvents = await contractAt(
+      "FastPriceEvents",
+      "0x3529ca912271555Ef88a2E9D1Db0f6CD5D2715c7",
+      signer
+    );
+
+  return {
+    fastPriceTokens,
+    fastPriceEvents,
+    tokenManager,
+    positionRouter1,
+    positionRouter2,
+    tokenArr,
+    updaters,
+    priceFeedTimelock,
+  };
+}
+
 async function getValues(signer) {
   if (network === "arbitrum") {
     return getArbValues(signer);
@@ -244,11 +325,19 @@ async function getValues(signer) {
   if (network === "sepolia") {
     return getSepoliaValues(signer);
   }
+  if (network === "avaxtest") {
+    return getAvaxTestValues(signer);
+  }
 }
 
 async function main() {
+  const provider = new ethers.providers.JsonRpcProvider(AVAX_TESTNET_URL);
+  const updaterWallet = new ethers.Wallet(AVAX_TESTNET_DEPLOY_KEY).connect(
+    provider
+  );
+
   const signer = await getFrameSigner();
-  const deployer = { address: "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471" };
+  const deployer = { address: "0xAcdC274B853e01e9666E03c662d30A83B8F73080" };
 
   const {
     fastPriceTokens,
@@ -274,8 +363,8 @@ async function main() {
   //     "0x2e5d207a4c0f7e7c52f6622dcc6eb44bc0fe1a13", // Krunal Amin
   //   ];
   const signers = [
-    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu1
-    "0x083102dEc08D0a449bEd627bE204531bf34251Ae", // xiaowu2
+    "0xAcdC274B853e01e9666E03c662d30A83B8F73080", // xiaowu1
+    "0xc71aABBC653C7Bd01B68C35B8f78F82A21014471", // xiaowu2
     "0xc7816AB57762479dCF33185bad7A1cFCb68a7997",
     "0x34d0B59D2E1262FD04445F7768F649fF6DC431a7",
     "0x1Ce32739c33Eecb06dfaaCa0E42bd04E56CCbF0d",
@@ -288,19 +377,25 @@ async function main() {
     throw new Error("Invalid price maxCumulativeDeltaDiff");
   }
 
-  const secondaryPriceFeed = await deployContract("FastPriceFeed", [
-    5 * 60, // _priceDuration
-    60 * 60, // _maxPriceUpdateDelay
-    1, // _minBlockInterval
-    250, // _maxDeviationBasisPoints
-    fastPriceEvents.address, // _fastPriceEvents
-    deployer.address, // _tokenManager
-  ]);
+  // const secondaryPriceFeed = await deployContract("FastPriceFeed", [
+  //   5 * 60, // _priceDuration
+  //   60 * 60, // _maxPriceUpdateDelay
+  //   1, // _minBlockInterval
+  //   250, // _maxDeviationBasisPoints
+  //   fastPriceEvents.address, // _fastPriceEvents
+  //   deployer.address, // _tokenManager
+  // ]);
 
-  //   const vaultPriceFeed = await deployContract("VaultPriceFeed", [])
+  const secondaryPriceFeed = await contractAt(
+    "FastPriceFeed",
+    "0xcd9Dc06ec9A1045030139b979378c2277EA67503",
+    updaterWallet
+  );
+
   const vaultPriceFeed = await contractAt(
     "VaultPriceFeed",
-    "0x57B4FA59741f3E59784ba4dc54deA5Ad610B0Dd4"
+    "0xCA6348817Ac5725225C00308b46F351D73652622",
+    updaterWallet
   );
 
   //   await sendTxn(
@@ -311,14 +406,15 @@ async function main() {
   //     vaultPriceFeed.setPriceSampleSpace(1),
   //     "vaultPriceFeed.setPriceSampleSpace"
   //   );
-  await sendTxn(
-    vaultPriceFeed.setSecondaryPriceFeed(secondaryPriceFeed.address),
-    "vaultPriceFeed.setSecondaryPriceFeed"
-  );
   //   await sendTxn(
   //     vaultPriceFeed.setIsAmmEnabled(false),
   //     "vaultPriceFeed.setIsAmmEnabled"
   //   );
+
+  await sendTxn(
+    vaultPriceFeed.setSecondaryPriceFeed(secondaryPriceFeed.address),
+    "vaultPriceFeed.setSecondaryPriceFeed"
+  );
 
   if (chainlinkFlags) {
     await sendTxn(

@@ -27,6 +27,12 @@ const {
   FTM_TESTNET_DEPLOY_KEY,
   SEPOLIA_URL,
   SEPOLIA_DEPLOY_KEY,
+  AVAX_TESTNET_URL,
+  AVAX_TESTNET_DEPLOY_KEY,
+  OPSIDE_TESTNET_URL,
+  OPSIDE_TESTNET_DEPLOY_KEY,
+  ROLLUX_TESTNET_URL,
+  ROLLUX_TESTNET_DEPLOY_KEY,
 } = require("./env.json");
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -118,6 +124,21 @@ module.exports = {
       url: SEPOLIA_URL,
       chainId: 11155111,
       accounts: [SEPOLIA_DEPLOY_KEY],
+    },
+    avaxtest: {
+      url: AVAX_TESTNET_URL,
+      chainId: 43113,
+      accounts: [AVAX_TESTNET_DEPLOY_KEY],
+    },
+    opsidetest: {
+      url: OPSIDE_TESTNET_URL,
+      chainId: 12020,
+      accounts: [OPSIDE_TESTNET_DEPLOY_KEY],
+    },
+    rolluxtest: {
+      url: ROLLUX_TESTNET_URL,
+      chainId: 57000,
+      accounts: [ROLLUX_TESTNET_DEPLOY_KEY],
     },
   },
   etherscan: {

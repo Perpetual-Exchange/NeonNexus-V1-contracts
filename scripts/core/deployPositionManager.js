@@ -175,6 +175,60 @@ async function getSepoliaValues(signer) {
   };
 }
 
+async function getAvaxTestValues(signer) {
+  const positionManagerAddress = "";
+  const vault = await contractAt(
+    "Vault",
+    "0xAC6E2Ac93E2a1CFFadE96607fe2376F5f5952EDC"
+  );
+  const positionUtils = await contractAt(
+    "PositionUtils",
+    "0x04Eb210750C9696A040333a7FaeeE791c945249E"
+  );
+  const timelock = await contractAt("Timelock", await vault.gov(), signer);
+  const router = await contractAt("Router", await vault.router(), signer);
+  const shortsTracker = await contractAt(
+    "ShortsTracker",
+    "0xD82bcA04b31eC58C5C2C62f798aC973A95c278d2",
+    signer
+  );
+  const weth = await contractAt("WETH", tokens.nativeToken.address);
+  const orderBook = await contractAt(
+    "OrderBook",
+    "0x05C3c68b882f5f14878c3a763b6002D9E4DA7Da0"
+  );
+  const referralStorage = await contractAt(
+    "ReferralStorage",
+    "0x62a48203B39573CC0dc989fDca6d28D5EE9C1Cc2"
+  );
+
+  const orderKeepers = [
+    { address: "0xAcdC274B853e01e9666E03c662d30A83B8F73080" },
+    { address: "0x1FD2692bfA672bCf6Bf4634ed48D436F422d0E48" },
+  ];
+  const liquidators = [
+    { address: "0xAcdC274B853e01e9666E03c662d30A83B8F73080" },
+  ];
+
+  const partnerContracts = [];
+
+  return {
+    positionManagerAddress,
+    positionUtils,
+    vault,
+    timelock,
+    router,
+    shortsTracker,
+    weth,
+    depositFee,
+    orderBook,
+    referralStorage,
+    orderKeepers,
+    liquidators,
+    partnerContracts,
+  };
+}
+
 async function getValues(signer) {
   if (network === "arbitrum") {
     return getArbValues(signer);
@@ -186,6 +240,10 @@ async function getValues(signer) {
 
   if (network === "sepolia") {
     return getSepoliaValues(signer);
+  }
+
+  if (network === "avaxtest") {
+    return getAvaxTestValues(signer);
   }
 }
 

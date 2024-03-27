@@ -499,6 +499,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         address payable _executionFeeReceiver
     ) public nonReentrant returns (bool) {
         IncreasePositionRequest memory request = increasePositionRequests[_key];
+
         // if the request was already executed or cancelled, return true so that the executeIncreasePositions loop will continue executing the next request
         if (request.account == address(0)) {
             return true;
@@ -509,6 +510,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
             request.blockTime,
             request.account
         );
+
         if (!shouldExecute) {
             return false;
         }
@@ -585,6 +587,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
             request.blockTime,
             request.account
         );
+
         if (!shouldCancel) {
             return false;
         }
@@ -814,6 +817,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         uint256 _positionBlockTime,
         address _account
     ) internal view returns (bool) {
+
         bool isKeeperCall = msg.sender == address(this) ||
             isPositionKeeper[msg.sender];
 

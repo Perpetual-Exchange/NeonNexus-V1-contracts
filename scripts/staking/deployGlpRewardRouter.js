@@ -59,6 +59,26 @@ async function getSepoliaValues() {
   return { nativeToken, glp, feeGlpTracker, stakedGlpTracker, glpManager };
 }
 
+async function getAvaxTestValues() {
+  const { nativeToken } = tokens;
+  const glp = { address: "0x0F02098Bb29FAc827f2DA6b330dB9B423Bd07B84" };
+
+  const feeGlpTracker = await contractAt(
+    "RewardTracker",
+    "0xf41184904bE4F79D7bF047688F42eD774EC457E7"
+  );
+  const stakedGlpTracker = await contractAt(
+    "RewardTracker",
+    "0x1dD38dee2fD5FEc859B0441Ef27e36C924085D0C"
+  );
+  const glpManager = await contractAt(
+    "GlpManager",
+    "0x459aF0e66F49302DaE40Ba548FbBb16E3263C71F"
+  );
+
+  return { nativeToken, glp, feeGlpTracker, stakedGlpTracker, glpManager };
+}
+
 async function getValues() {
   if (network === "arbitrum") {
     return getArbValues();
@@ -71,17 +91,22 @@ async function getValues() {
   if (network === "sepolia") {
     return getSepoliaValues();
   }
+
+  if (network === "avaxtest") {
+    return getAvaxTestValues();
+  }
 }
 
 async function main() {
   const { nativeToken, glp, feeGlpTracker, stakedGlpTracker, glpManager } =
     await getValues();
 
-  //   const rewardRouter = await deployContract("RewardRouterV2", []);
-  const rewardRouter = await contractAt(
-    "RewardRouterV2",
-    "0xA855150b836f6CD1De66581904103BD90e9B391C"
-  );
+    const rewardRouter = await deployContract("RewardRouterV2", []);
+  // ms const rewardRouter = await contractAt(
+  //   "RewardRouterV2",
+  //   "0x800db23793bBA846f378296E7b492F731D1eE464"
+  // );
+
   //   await sendTxn(
   //     rewardRouter.initialize(
   //       nativeToken.address, // _weth

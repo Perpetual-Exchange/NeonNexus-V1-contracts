@@ -10,7 +10,7 @@ const network = process.env.HARDHAT_NETWORK || "mainnet";
 async function main() {
   const reader = await deployContract("Reader", [], "Reader");
 
-  if (network === "avax" || network === "sepolia") {
+  if (network === "avax" || network === "sepolia" || network === "avaxtest") {
     await sendTxn(reader.setConfig(true), "Reader.setConfig");
   }
 
